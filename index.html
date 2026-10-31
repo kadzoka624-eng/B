@@ -25,7 +25,7 @@ canvas{display:block}
 #backroomsHud{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:6;width:min(270px,42vw);display:none;pointer-events:none;text-align:center;font-size:10px;letter-spacing:2px;color:#d8d0ad;text-shadow:0 2px 5px #000}
 #sleepTrack{height:10px;margin-top:7px;padding:1px;background:#080907;border:1px solid #a99a6d88;box-shadow:0 2px 10px #0009}
 #sleepFill{height:100%;width:0;background:linear-gradient(90deg,#8c9a70,#d4b76f,#b34c3e);transition:width .2s linear}
-#waterCounter{position:fixed;top:14px;right:16px;z-index:6;display:none;padding:9px 12px;background:rgba(8,13,16,.88);border:1px solid #91b7c477;color:#e0e8e9;font-size:12px;letter-spacing:1px;pointer-events:none}#drinkButton{display:none;position:fixed;top:54px;right:16px;z-index:12;width:34px;height:30px;background:#182126eF;border:1px solid #b8c7bd99;color:#fff;font-size:15px;cursor:pointer;pointer-events:auto}#drinkFlash{display:none;position:fixed;left:50%;top:58%;transform:translate(-50%,-50%);z-index:13;padding:14px 20px;background:#101719eF;border:1px solid #b8c7bd99;color:#e7eddf;letter-spacing:2px;font-size:12px;pointer-events:none}#drinkFlash.show{display:block;animation:drinkAnim .9s ease both}@keyframes drinkAnim{0%{opacity:0;transform:translate(-50%,-35%) scale(.7)}20%,75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-70%) scale(.9)}}
+#alertHud{position:fixed;top:14px;left:14px;z-index:7;display:none;width:118px;padding:7px 9px;background:rgba(12,10,9,.86);border:1px solid #b99b7a88;color:#e9d8c3;font-size:12px;letter-spacing:2px;pointer-events:none;text-shadow:0 1px 4px #000}#alertTrack{height:7px;margin-top:6px;background:#080707;border:1px solid #80685b;overflow:hidden}#alertFill{height:100%;width:0;background:linear-gradient(90deg,#b18a58,#c94d36,#ff241c);box-shadow:0 0 8px #e43b2d;transition:width .12s linear}#sprintBtn{width:70px;height:48px;border-radius:15px;font-size:24px;background:#273126e8;border:1px solid #b9c9a099;box-shadow:0 3px 12px #0008;touch-action:none}#sprintBtn.active{background:#a8bd83;color:#111;border-color:#efffd4;box-shadow:0 0 18px #a8bd8388}#waterCounter{position:fixed;top:14px;right:16px;z-index:6;display:none;padding:9px 12px;background:rgba(8,13,16,.88);border:1px solid #91b7c477;color:#e0e8e9;font-size:12px;letter-spacing:1px;pointer-events:none}#drinkButton{display:none;position:fixed;top:54px;right:16px;z-index:12;width:34px;height:30px;background:#182126eF;border:1px solid #b8c7bd99;color:#fff;font-size:15px;cursor:pointer;pointer-events:auto}#drinkFlash{display:none;position:fixed;left:50%;top:58%;transform:translate(-50%,-50%);z-index:13;padding:14px 20px;background:#101719eF;border:1px solid #b8c7bd99;color:#e7eddf;letter-spacing:2px;font-size:12px;pointer-events:none}#drinkFlash.show{display:block;animation:drinkAnim .9s ease both}@keyframes drinkAnim{0%{opacity:0;transform:translate(-50%,-35%) scale(.7)}20%,75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-70%) scale(.9)}}
 #crosshair{position:fixed;top:50%;left:50%;width:4px;height:4px;background:white;transform:translate(-50%,-50%);pointer-events:none}
 #hint{display:none!important}
 #vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse,transparent 55%,#0007 100%)}
@@ -106,6 +106,7 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
   <div class="stat-card"><div class="stat-head"><span><span id="brainIcon">◉</span> AKIL SAĞLIĞI</span><span class="stat-value" id="sanityValue">100%</span></div><div class="bar-track"><div class="bar-fill" id="sanityFill"></div></div></div>
 </div>
 <div id="backroomsHud">UYKU<div id="sleepTrack"><div id="sleepFill"></div></div></div>
+<div id="alertHud">!<div id="alertTrack"><div id="alertFill"></div></div></div>
 <div id="waterCounter">ENERJİ İÇECEĞİ: <span id="waterCountHud">0</span></div>
 <button id="drinkButton" type="button" aria-label="Enerji içeceği iç">X</button><div id="drinkFlash">İÇİLİYOR...</div>
 <div id="crosshair"></div>
@@ -121,7 +122,7 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 <div id="mobile">
   <div id="lookArea"></div>
   <div id="joystick"><div id="stick"></div></div>
-  <div id="rightControls"><button id="interact">ETKİLEŞ</button><div id="utilityControls"><button id="crouchBtn" aria-label="Eğil">EĞİL</button><button id="flashlightBtn" aria-label="El fenerini aç" title="El feneri">🔦</button></div></div>
+  <div id="rightControls"><button id="interact">ETKİLEŞ</button><button id="sprintBtn" aria-label="Koş" title="Koş">👟</button><div id="utilityControls"><button id="crouchBtn" aria-label="Eğil">EĞİL</button><button id="flashlightBtn" aria-label="El fenerini aç" title="El feneri">🔦</button></div></div>
 </div>
 
 <div id="start">
@@ -1675,6 +1676,14 @@ document.getElementById('interact').addEventListener('pointerdown',e=>{
   interact();
 });
 
+const sprintBtn=document.getElementById('sprintBtn');
+function setMobileSprint(active){
+  keys.ShiftLeft=active;
+  sprintBtn.classList.toggle('active',active);
+}
+sprintBtn.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();setMobileSprint(true);try{sprintBtn.setPointerCapture(e.pointerId);}catch(_){}});
+for(const ev of ['pointerup','pointercancel','lostpointercapture'])sprintBtn.addEventListener(ev,e=>{e.preventDefault();setMobileSprint(false);});
+
 const crouchBtn=document.getElementById('crouchBtn');
 crouchBtn.addEventListener('pointerdown',e=>{
   e.preventDefault();
@@ -1883,6 +1892,7 @@ let backroomsGuide=null;
 let backroomsSleep=0, backroomsSleepWarned=false, backroomsSleepCritical=false;
 let almondWaterCount=0, almondWaterItems=[], almondWaterGroup=null, almondWaterSpawned=false;
 let guideFinished=false, drinkAnimating=false, drinkAnimationTime=0;
+let backroomsAlert=0;
 let sleepBlinkCooldown=0,sleepBlinkTime=0;
 let almondWaterSpeedBoost=0;
 let forestActive=false;
@@ -2521,7 +2531,13 @@ function updateBackroomsItems(dt){
   if(!backroomsActive)return;
   const hud=document.getElementById('backroomsHud'), counter=document.getElementById('waterCounter'), drink=document.getElementById('drinkButton');
   hud.style.display=guideFinished?'block':'none';counter.style.display=guideFinished?'block':'none';drink.style.display=guideFinished&&almondWaterCount>0?'block':'none';
-  if(!guideFinished)return;
+  const alertHud=document.getElementById('alertHud');
+  alertHud.style.display=guideFinished?'block':'none';
+  if(!guideFinished){document.getElementById('alertFill').style.width='0%';return;}
+  const hasMoveInput=keys.KeyW||keys.KeyA||keys.KeyS||keys.KeyD||Math.abs(joyX)+Math.abs(joyY)>.12;
+  const isRunning=(keys.ShiftLeft||keys.ShiftRight)&&hasMoveInput&&!keys.KeyC&&stamina>0;
+  backroomsAlert=Math.max(0,Math.min(100,backroomsAlert+(isRunning?dt*34:-dt*10)));
+  document.getElementById('alertFill').style.width=backroomsAlert+'%';
   backroomsSleep=Math.min(100,backroomsSleep+dt*.22);
   almondWaterSpeedBoost=Math.max(0,almondWaterSpeedBoost-dt);
   if(drinkAnimating){drinkAnimationTime-=dt;if(drinkAnimationTime<=0){drinkAnimating=false;drink.disabled=false;document.getElementById('drinkFlash').classList.remove('show');}}
@@ -2539,8 +2555,6 @@ function updateBackroomsItems(dt){
     if(almondWaterCount<6&&Math.hypot(player.x-item.position.x,player.z-item.position.z)<1.05){
       item.userData.collected=true;item.visible=false;almondWaterCount++;
       document.getElementById('waterCountHud').textContent=String(almondWaterCount);
-      backroomsSleep=Math.max(0,backroomsSleep-(item.userData.rare?65:48));document.getElementById('sleepFill').style.width=backroomsSleep+'%';
-      almondWaterSpeedBoost=5;
       showSubtitle(item.userData.rare?'Nadir enerji içeceği buldun.':'Enerji içeceği buldun.');
     }
   }
@@ -2548,7 +2562,7 @@ function updateBackroomsItems(dt){
 
 function enterBackrooms(){
   forestActive=false;backroomsActive=true;collapseStarted=false;collapseTime=0;movementLocked=false;
-  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
+  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
   if(backroomsGuide)backroomsGuide.visible=false;
   startBackroomsAmbience();
   startBackroomsCreaks();
