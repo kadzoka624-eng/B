@@ -22,6 +22,10 @@ canvas{display:block}
 #heartIcon{display:inline-block;color:#a2a88a;font-size:14px;line-height:12px;transform-origin:center;animation:heartBeat 1.05s infinite}
 #brainIcon{font-size:13px;color:#b4a078}
 @keyframes heartBeat{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}28%{transform:scale(1)}42%{transform:scale(1.12)}58%{transform:scale(1)}}
+#backroomsHud{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:6;width:min(270px,42vw);display:none;pointer-events:none;text-align:center;font-size:10px;letter-spacing:2px;color:#d8d0ad;text-shadow:0 2px 5px #000}
+#sleepTrack{height:10px;margin-top:7px;padding:1px;background:#080907;border:1px solid #a99a6d88;box-shadow:0 2px 10px #0009}
+#sleepFill{height:100%;width:0;background:linear-gradient(90deg,#8c9a70,#d4b76f,#b34c3e);transition:width .2s linear}
+#waterCounter{position:fixed;top:14px;right:16px;z-index:6;display:none;padding:9px 12px;background:rgba(8,13,16,.88);border:1px solid #91b7c477;color:#e0e8e9;font-size:12px;letter-spacing:1px;pointer-events:none}
 #crosshair{position:fixed;top:50%;left:50%;width:4px;height:4px;background:white;transform:translate(-50%,-50%);pointer-events:none}
 #hint{display:none!important}
 #vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse,transparent 55%,#0007 100%)}
@@ -101,6 +105,8 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
   <div class="stat-card"><div class="stat-head"><span><span id="heartIcon">♥</span> STAMINA</span><span class="stat-value" id="staminaValue">100%</span></div><div class="bar-track"><div class="bar-fill" id="staminaFill"></div></div></div>
   <div class="stat-card"><div class="stat-head"><span><span id="brainIcon">◉</span> AKIL SAĞLIĞI</span><span class="stat-value" id="sanityValue">100%</span></div><div class="bar-track"><div class="bar-fill" id="sanityFill"></div></div></div>
 </div>
+<div id="backroomsHud">UYKU<div id="sleepTrack"><div id="sleepFill"></div></div></div>
+<div id="waterCounter">BADEM SUYU: <span id="waterCountHud">0</span></div>
 <div id="crosshair"></div>
 <div id="hint">WASD: HAREKET · MOUSE: BAKIŞ</div>
 <div id="vignette"></div>
@@ -1868,6 +1874,9 @@ let backroomsEncounterStep=0;
 let backroomsEncounterStepTime=0;
 let backroomsEncounterWobble=0;
 let backroomsGuide=null;
+let backroomsSleep=0, backroomsSleepWarned=false, backroomsSleepCritical=false;
+let almondWaterCount=0, almondWaterItems=[], almondWaterGroup=null, almondWaterSpawned=false;
+let almondWaterSpeedBoost=0;
 let forestActive=false;
 let cryingLevel=0, collapseStarted=false, collapseTime=0;
 const tearOverlay=document.getElementById("tearOverlay"), eyelids=document.getElementById("eyelids");
@@ -2460,9 +2469,48 @@ function collides(x,z){
   return false;
 }
 
+function spawnAlmondWaters(){
+  if(almondWaterSpawned)return;
+  almondWaterSpawned=true;
+  almondWaterGroup=new THREE.Group();backroomsScene.add(almondWaterGroup);
+  const loader=new THREE.TextureLoader();
+  const commonTexture=loader.load('./object/water2.png');
+  const rareTexture=loader.load('./object/water.png');
+  for(let i=0;i<12;i++){
+    const angle=Math.random()*Math.PI*2, distance=9+Math.random()*42;
+    const x=player.x+Math.cos(angle)*distance, z=player.z+Math.sin(angle)*distance;
+    // water.png nadir, water2.png yaygın olarak çıkar.
+    const isRare=Math.random()<0.12;
+    const material=new THREE.SpriteMaterial({map:isRare?rareTexture:commonTexture,transparent:true,depthWrite:false});
+    const sprite=new THREE.Sprite(material);sprite.position.set(x,.72,z);sprite.scale.set(.62,.9,1);
+    sprite.userData={collected:false,rare:isRare};almondWaterGroup.add(sprite);almondWaterItems.push(sprite);
+  }
+}
+function updateBackroomsItems(dt){
+  if(!backroomsActive)return;
+  const hud=document.getElementById('backroomsHud'), counter=document.getElementById('waterCounter');
+  hud.style.display='block';counter.style.display='block';
+  backroomsSleep=Math.min(100,backroomsSleep+dt*.22);
+  almondWaterSpeedBoost=Math.max(0,almondWaterSpeedBoost-dt);
+  document.getElementById('sleepFill').style.width=backroomsSleep+'%';
+  if(backroomsSleep>=28&&!backroomsSleepWarned){backroomsSleepWarned=true;showSubtitle('Uykum gelmeye başladı... Gözlerimi açık tutmalıyım.');}
+  if(backroomsSleep>=68&&!backroomsSleepCritical){backroomsSleepCritical=true;showSubtitle('Gözlerim kapanıyor... Biraz daha dayanmalıyım.');}
+  for(const item of almondWaterItems){
+    if(item.userData.collected)continue;
+    item.material.rotation+=dt*.12;
+    if(Math.hypot(player.x-item.position.x,player.z-item.position.z)<1.05){
+      item.userData.collected=true;item.visible=false;almondWaterCount++;
+      document.getElementById('waterCountHud').textContent=String(almondWaterCount);
+      backroomsSleep=Math.max(0,backroomsSleep-(item.userData.rare?55:38));document.getElementById('sleepFill').style.width=backroomsSleep+'%';
+      almondWaterSpeedBoost=5;
+      showSubtitle(item.userData.rare?'Nadir badem suyu! Uykun açıldı, hızlandın.':'Badem suyu buldun. Uykun azaldı, 5 saniye hızlandın.');
+    }
+  }
+}
+
 function enterBackrooms(){
   forestActive=false;backroomsActive=true;collapseStarted=false;collapseTime=0;movementLocked=false;
-  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
+  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
   if(backroomsGuide)backroomsGuide.visible=false;
   startBackroomsAmbience();
   startBackroomsCreaks();
@@ -2525,6 +2573,7 @@ function updateBackroomsEncounter(dt){
   if(backroomsEncounterStep>=lines.length&&backroomsEncounterStepTime>=40){
     stalkerDialogueActive=false;movementLocked=false;
     if(backroomsGuide)backroomsGuide.visible=false;
+    spawnAlmondWaters();
   }
 }
 
@@ -2597,7 +2646,7 @@ function updateMovement(dt){
   crouchAmount=THREE.MathUtils.damp(crouchAmount,crouching?1:0,9,dt);
   const sprintRequested=keys.ShiftLeft||keys.ShiftRight;
   const actuallySprinting=sprintRequested&&stamina>0&&!crouching;
-  const speed=(actuallySprinting?4.2:player.speed)*(crouching?.48:1);
+  const speed=(actuallySprinting?4.2:player.speed)*(crouching?.48:1)*(backroomsActive&&almondWaterSpeedBoost>0?1.45:1);
 
   const dx=(
     -Math.sin(player.yaw)*forward+
@@ -2738,6 +2787,7 @@ function animate(){
 
   updateMovement(dt);
   updateBackroomsEncounter(dt);
+  updateBackroomsItems(dt);
   updateSurvivalHud(dt);
   updateMentalState(dt);
   updateSleep(dt);
