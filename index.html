@@ -1091,8 +1091,12 @@ function unlockHTMLAudio(audio){
     console.warn('Ses baslatilamadi:',audio.currentSrc||audio.src,error);
   }
 }
+let gameAudioUnlocked=false;
 function unlockGameAudio(){
-  if(!started)return;
+  if(!started||gameAudioUnlocked)return;
+  // Bu işlem yalnızca ilk OYNA tıklamasında yapılmalı. Her pointerdown'da
+  // tekrar çalışırsa çalmakta olan ortam/jumpscare seslerini pause eder.
+  gameAudioUnlocked=true;
   initAudio();
   const allGameAudio=[...jumpscareAudioPool,forestAmbienceAudio,backroomsAmbienceAudio,mushroomPeopleAudio,flashlightSwitchAudio];
   allGameAudio.forEach(audio=>{
