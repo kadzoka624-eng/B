@@ -84,14 +84,14 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 #subtitle{bottom:13%;font-size:12px;max-width:90vw;padding:9px 13px;line-height:1.55}
 }
 </style>
-<link rel="preload" href="./jumps1.wav" as="audio">
-<link rel="preload" href="./jumps2.wav" as="audio">
-<link rel="preload" href="./jumps3.wav" as="audio">
-<link rel="preload" href="./jumps4.wav" as="audio">
-<link rel="preload" href="./jumps5.wav" as="audio">
-<link rel="preload" href="./jumps6.wav" as="audio">
-<link rel="preload" href="./forest.wav" as="audio">
-<link rel="preload" href="./backrooms.wav" as="audio">
+<link rel="preload" href="./horor/jumps1.wav" as="audio">
+<link rel="preload" href="./horor/jumps2.wav" as="audio">
+<link rel="preload" href="./horor/jumps3.wav" as="audio">
+<link rel="preload" href="./horor/jumps4.wav" as="audio">
+<link rel="preload" href="./horor/jumps5.wav" as="audio">
+<link rel="preload" href="./horor/jumps6.wav" as="audio">
+<link rel="preload" href="./mekan/forest.wav" as="audio">
+<link rel="preload" href="./mekan/backrooms.wav" as="audio">
 </head>
 <body>
 
@@ -393,7 +393,7 @@ for(let i=0;i<18;i++){
 }
 let mushroomUsed=false,mushroomEffectTime=0;
 // Mantar patladiginda minik insanlar kaybolana kadar ortam sesi calar.
-const mushroomPeopleAudio=new Audio('./mens.wav');
+const mushroomPeopleAudio=new Audio('./other/mens.wav');
 mushroomPeopleAudio.loop=true;
 mushroomPeopleAudio.preload='auto';
 mushroomPeopleAudio.volume=0.78;
@@ -1019,11 +1019,11 @@ function initAudio(){
   return audioContext;
 }
 
-// Jumpscare sesleri GitHub deposunda index.html ile ayni klasorde bulunur.
+// Jumpscare sesleri GitHub deposundaki horor klasorunde bulunur.
 // jumps1.wav - jumps6.wav arasindan rastgele secilir. Tum sesler
 // kullanilmadan ayni ses yeniden secilmez.
 const jumpscareSoundFiles=[
-  './jumps1.wav','./jumps2.wav','./jumps3.wav','./jumps4.wav','./jumps5.wav','./jumps6.wav'
+  './horor/jumps1.wav','./horor/jumps2.wav','./horor/jumps3.wav','./horor/jumps4.wav','./horor/jumps5.wav','./horor/jumps6.wav'
 ];
 const jumpscareAudioPool=jumpscareSoundFiles.map(src=>{
   const audio=new Audio(src);
@@ -1128,11 +1128,11 @@ function startBackroomsCreaks(){
 function stopBackroomsCreaks(){if(backroomsCreakTimer){clearTimeout(backroomsCreakTimer);backroomsCreakTimer=null;}}
 
 // Ortam sesleri: her sahnede ilgili WAV dosyası sürekli döner.
-const forestAmbienceAudio=new Audio('./forest.wav');
+const forestAmbienceAudio=new Audio('./mekan/forest.wav');
 forestAmbienceAudio.loop=true;
 forestAmbienceAudio.preload='auto';
 forestAmbienceAudio.volume=0.48;
-const backroomsAmbienceAudio=new Audio('./backrooms.wav');
+const backroomsAmbienceAudio=new Audio('./mekan/backrooms.wav');
 backroomsAmbienceAudio.loop=true;
 backroomsAmbienceAudio.preload='auto';
 backroomsAmbienceAudio.volume=0.48;
@@ -1150,7 +1150,7 @@ function startEnvironmentAmbience(audio){
   activeAmbienceAudio=audio;
   audio.currentTime=0;
   const result=audio.play();
-  if(result&&typeof result.catch==='function')result.catch(error=>console.warn('Ortam sesi oynatılamadı. WAV dosyasını index.html ile aynı klasöre ekleyin.',error));
+  if(result&&typeof result.catch==='function')result.catch(error=>console.warn('Ortam sesi oynatılamadı. WAV dosyasının GitHub deposundaki ilgili klasörde bulunduğunu kontrol edin.',error));
 }
 function startForestAmbience(){startEnvironmentAmbience(forestAmbienceAudio);}
 function startBackroomsAmbience(){startEnvironmentAmbience(backroomsAmbienceAudio);}
