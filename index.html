@@ -135,6 +135,15 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
   <div id="studioCredit">MADE BY KADIR'S STUDIOS</div>
 </div>
 
+<div id="responsibilityNotice" role="dialog" aria-modal="true" aria-labelledby="noticeTitle" style="display:none;position:fixed;inset:0;z-index:40;align-items:center;justify-content:center;padding:22px;background:rgba(0,0,0,.94);text-align:center;">
+  <div style="width:min(620px,94vw);padding:clamp(22px,5vw,42px);background:linear-gradient(160deg,#171719,#09090b);border:1px solid #8c8174;box-shadow:0 0 45px #000;">
+    <h2 id="noticeTitle" style="margin:0 0 24px;font-size:clamp(17px,3vw,23px);font-weight:400;letter-spacing:3px;color:#d8c7b3;">SORUMLULUK RET BEYANI</h2>
+    <p style="margin:0;color:#ddd;font-size:clamp(12px,2.2vw,15px);line-height:2;letter-spacing:.4px;">Bu oyunda yüksek seviyede ses ve ani ışık değişimleri vardır. Kulaklık takmanızı şiddetle tavsiye ediyoruz!</p>
+    <p style="margin:22px 0 28px;color:#aaa;font-size:clamp(12px,2.2vw,14px);line-height:2;">Oyunu geliştirirken sorunlar yaşayan yapımcımız (ben), bu oyunu oynamayı seçen sizler için iyi oyunlar dilerim.<br><br><span style="color:#d8c7b3;letter-spacing:2px;">- KADİR</span></p>
+    <button id="noticeContinue" type="button" style="padding:13px 25px;letter-spacing:2px;cursor:pointer;">ANLADIM, DEVAM ET</button>
+  </div>
+</div>
+
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
@@ -2998,16 +3007,20 @@ const loadingInterval=setInterval(()=>{
   }
 },2500);
 
-// BAŞLAT
+// OYUN ÖNCESİ BİLGİLENDİRME VE BAŞLATMA
+const responsibilityNotice=document.getElementById('responsibilityNotice');
 document.getElementById('play').addEventListener('click',()=>{
+  document.getElementById('start').style.display='none';
+  responsibilityNotice.style.display='flex';
+});
+document.getElementById('noticeContinue').addEventListener('click',()=>{
+  responsibilityNotice.style.display='none';
   // Ses motorunu kullanicinin dogrudan tiklamasi sirasinda baslat.
   initAudio();
   started=true;
-  // Ses dosyalarinin oynatma iznini ilk kullanici tiklamasinda ac.
+  // Ses dosyalarinin oynatma iznini kullanici tiklamasinda ac.
   unlockGameAudio();
   enableMotionShake();
-  document.getElementById('start').style.display='none';
-
   if(matchMedia('(pointer:fine)').matches){
     renderer.domElement.requestPointerLock?.();
   }
