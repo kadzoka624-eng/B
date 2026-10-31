@@ -1539,6 +1539,11 @@ function interact(){
 // KLAVYE
 document.addEventListener('keydown',e=>{
   keys[e.code]=true;
+  if((e.key||'').toLocaleLowerCase('tr-TR')==='ğ'&&!e.repeat&&backroomsActive&&guideFinished){
+    backroomsSleep=Math.min(100,backroomsSleep+12);
+    document.getElementById('sleepFill').style.width=backroomsSleep+'%';
+    if(!stalkerDialogueActive&&!subtitle.classList.contains('visible'))showSubtitle('Uykusuzluk bastırıyor...');
+  }
   if(e.code==='KeyC'){crouchBtn.classList.add('active');crouchBtn.textContent='KALK';}
   if(e.code==='KeyP'&&!e.repeat&&forestActive&&!backroomsActive){sanity=1;showSubtitle('Akıl sağlığın kritik seviyeye düştü.');}
   if(e.code==='KeyE'&&!e.repeat)interact();
@@ -1878,6 +1883,7 @@ let backroomsGuide=null;
 let backroomsSleep=0, backroomsSleepWarned=false, backroomsSleepCritical=false;
 let almondWaterCount=0, almondWaterItems=[], almondWaterGroup=null, almondWaterSpawned=false;
 let guideFinished=false, drinkAnimating=false, drinkAnimationTime=0;
+let sleepBlinkCooldown=0,sleepBlinkTime=0;
 let almondWaterSpeedBoost=0;
 let forestActive=false;
 let cryingLevel=0, collapseStarted=false, collapseTime=0;
@@ -2520,6 +2526,11 @@ function updateBackroomsItems(dt){
   almondWaterSpeedBoost=Math.max(0,almondWaterSpeedBoost-dt);
   if(drinkAnimating){drinkAnimationTime-=dt;if(drinkAnimationTime<=0){drinkAnimating=false;drink.disabled=false;document.getElementById('drinkFlash').classList.remove('show');}}
   document.getElementById('sleepFill').style.width=backroomsSleep+'%';
+  sleepBlinkCooldown-=dt;
+  if(backroomsSleep>=76){
+    if(sleepBlinkTime>0){sleepBlinkTime-=dt;blink.style.opacity=String(Math.min(.88,(backroomsSleep-68)/36));}
+    else{blink.style.opacity='0';if(sleepBlinkCooldown<=0){sleepBlinkTime=.16;sleepBlinkCooldown=Math.max(.65,2.8-(backroomsSleep-76)*.045);}}
+  }else{sleepBlinkTime=0;blink.style.opacity='0';}
   if(backroomsSleep>=28&&!backroomsSleepWarned&&!stalkerDialogueActive&&!subtitle.classList.contains('visible')){backroomsSleepWarned=true;showSubtitle('Uykum gelmeye başladı... Gözlerimi açık tutmalıyım.');}
   if(backroomsSleep>=68&&!backroomsSleepCritical&&!stalkerDialogueActive&&!subtitle.classList.contains('visible')){backroomsSleepCritical=true;showSubtitle('Gözlerim kapanıyor... Biraz daha dayanmalıyım.');}
   for(const item of almondWaterItems){
@@ -2537,7 +2548,7 @@ function updateBackroomsItems(dt){
 
 function enterBackrooms(){
   forestActive=false;backroomsActive=true;collapseStarted=false;collapseTime=0;movementLocked=false;
-  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
+  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
   if(backroomsGuide)backroomsGuide.visible=false;
   startBackroomsAmbience();
   startBackroomsCreaks();
@@ -2801,7 +2812,8 @@ function updatePotHint(){
 }
 
 
-document.getElementById('drinkButton').addEventListener('click',drinkEnergy);
+document.getElementById('drinkButton').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();drinkEnergy();});
+document.getElementById('drinkButton').addEventListener('pointerdown',e=>{e.stopPropagation();});
 
 // OYUN DÖNGÜSÜ
 const clock=new THREE.Clock();
