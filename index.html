@@ -1057,6 +1057,10 @@ function playScareSound(){
   }catch(error){console.error('Jumpscare ses hatasi:',sound.src,error);}
 }
 
+function playDoorCatScareSound(){
+  playScareSound();
+}
+
 // Tarayici sekmeyi arka plana alip sesi durdurursa ilk sonraki etkilesimde ac.
 function unlockHTMLAudio(audio){
   if(!audio)return;
@@ -1365,7 +1369,9 @@ function triggerDoorCatScare(){
   overlay.classList.remove("show");
   void overlay.offsetWidth;
   overlay.classList.add("show");
-  try{playScareSound();}catch(e){}
+  // Kapıya 40. etkileşimde gelen kedi, horor klasöründeki altı
+  // jumpscare sesinden mevcut karıştırılmış sıradaki birini çalar.
+  playDoorCatScareSound();
   setTimeout(()=>overlay.classList.remove("show"),680);
 }
 
