@@ -87,6 +87,7 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 #start h1{letter-spacing:5px}
 #subtitle{bottom:13%;font-size:12px;max-width:90vw;padding:9px 13px;line-height:1.55}
 }
+#luciJumpscare{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:#000;pointer-events:none;overflow:hidden}#luciJumpscare.show{display:flex;animation:luciFlash .78s steps(2,end) both}#luciJumpscare img{width:min(100vw,900px);height:100vh;object-fit:contain;filter:contrast(1.2) brightness(1.15) drop-shadow(0 0 28px #a00);animation:luciRush .78s cubic-bezier(.12,.78,.18,1) both}@keyframes luciFlash{0%,100%{background:#000}15%,45%{background:#4b0000}30%,70%{background:#090000}}@keyframes luciRush{0%{transform:scale(.35);opacity:.2}35%{transform:scale(1.25);opacity:1}100%{transform:scale(1.55);opacity:0}}
 </style>
 <link rel="preload" href="./horor/jumps1.wav" as="audio">
 <link rel="preload" href="./horor/jumps2.wav" as="audio">
@@ -118,6 +119,7 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 <div id="tearOverlay"><i class="tear"></i><i class="tear"></i><i class="tear"></i><i class="tear"></i></div>
 <div id="eyelids"></div>
 <div id="catJumpscare" aria-hidden="true"><svg viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg"><path fill="#050706" stroke="#17251c" stroke-width="8" d="M72 600Q48 500 105 414L116 250 62 75 190 151Q250 115 310 151L438 75 384 250 395 414Q452 500 428 600Z"/><path fill="#d8ffb2" d="M145 280Q190 225 232 286Q190 330 145 280ZM268 286Q310 225 355 280Q310 330 268 286Z"/><ellipse cx="190" cy="280" rx="12" ry="25" fill="#050706"/><ellipse cx="310" cy="280" rx="12" ry="25" fill="#050706"/><path d="M230 360Q250 380 270 360L250 390Z" fill="#9bff9a"/><path d="M250 390Q220 430 190 405M250 390Q280 430 310 405" fill="none" stroke="#6f9874" stroke-width="9" stroke-linecap="round"/></svg></div>
+<div id="luciJumpscare" aria-hidden="true"><img src="./luci/luci.png" alt=""></div>
 
 <div id="mobile">
   <div id="lookArea"></div>
@@ -2527,6 +2529,90 @@ function drinkEnergy(){
   document.getElementById('drinkButton').disabled=true;
   showSubtitle('Enerji içeceğini içtin. Uykun açıldı.');
 }
+// Luci saldırısı: kırmızı alarm seviyesinde ve oyuncuya yakınken jumpscare.
+const luciAttackAudio=new Audio('./luca/lisa.wav');
+luciAttackAudio.preload='auto';luciAttackAudio.volume=1;
+let luciScareCooldown=0,luciCollapseTime=0,luciCollapsing=false;
+function triggerLuciAttack(){
+  if(luciScareCooldown>0||luciCollapsing)return;
+  luciScareCooldown=5.5;
+  const overlay=document.getElementById('luciJumpscare');
+  overlay.classList.remove('show');void overlay.offsetWidth;overlay.classList.add('show');
+  try{luciAttackAudio.pause();luciAttackAudio.currentTime=0;const play=luciAttackAudio.play();if(play?.catch)play.catch(err=>console.warn('Luci sesi oynatılamadı:',err));}catch(err){console.warn('Luci ses hatası:',err);}
+  setTimeout(()=>overlay.classList.remove('show'),820);
+  backroomsSleep=Math.min(100,backroomsSleep+24);
+  document.getElementById('sleepFill').style.width=backroomsSleep+'%';
+  showSubtitle('Luci sana saldırdı. Uykun ağırlaşıyor...');
+  if(backroomsSleep>=100){
+    luciCollapsing=true;luciCollapseTime=0;movementLocked=true;
+    showSubtitle('Gözlerin kapanıyor...');
+  }
+}
+function updateLuciCollapse(dt){
+  luciScareCooldown=Math.max(0,luciScareCooldown-dt);
+  if(!luciCollapsing)return;
+  luciCollapseTime+=dt;
+  camera.position.y=THREE.MathUtils.lerp(camera.position.y,.28,Math.min(1,luciCollapseTime/1.25));
+  camera.rotation.x=THREE.MathUtils.lerp(camera.rotation.x,.95,Math.min(1,luciCollapseTime/1.25));
+  if(luciCollapseTime>1.3){luciCollapsing=false;movementLocked=false;backroomsSleep=65;document.getElementById('sleepFill').style.width='65%';showSubtitle('Bir süreliğine kendinden geçtin...');}
+}
+
+// BACKROOMS LUCI: uzaktan izler, yaklasinca baska noktaya isinlanir.
+let luciGhost=null,luciTexture=null,luciTeleportCooldown=0,luciRevealTime=0,luciAttackCooldown=0,luciPhase=0;
+const luciForward=new THREE.Vector3(),luciRight=new THREE.Vector3(),luciTarget=new THREE.Vector3();
+function createLuciGhost(){
+  if(luciGhost)return luciGhost;
+  const texLoader=new THREE.TextureLoader();
+  luciTexture=texLoader.load('./luci/luci.png',()=>{if(luciGhost)luciGhost.visible=true;},undefined,()=>{if(luciGhost)luciGhost.visible=false;});
+  luciTexture.colorSpace=THREE.SRGBColorSpace;
+  const mat=new THREE.MeshBasicMaterial({map:luciTexture,transparent:true,alphaTest:.06,side:THREE.DoubleSide,depthWrite:false});
+  luciGhost=new THREE.Mesh(new THREE.PlaneGeometry(1.65,2.8),mat);
+  luciGhost.position.set(0,-30,0);luciGhost.visible=false;luciGhost.renderOrder=4;backroomsScene.add(luciGhost);
+  return luciGhost;
+}
+function luciPlaceAtDistance(distance,side=1){
+  const ghost=createLuciGhost();camera.getWorldDirection(luciForward);luciForward.y=0;luciForward.normalize();
+  luciRight.set(-luciForward.z,0,luciForward.x);
+  const angle=(Math.random()-.5)*.9;
+  luciTarget.set(player.x,0,player.z).addScaledVector(luciForward,Math.cos(angle)*distance).addScaledVector(luciRight,Math.sin(angle)*distance*side);
+  ghost.position.set(luciTarget.x,1.42,luciTarget.z);ghost.lookAt(player.x,1.4,player.z);
+}
+function updateLuciGhost(dt){
+  if(!backroomsActive||!guideFinished)return;
+  const ghost=createLuciGhost();
+  const fear=THREE.MathUtils.clamp(backroomsSleep/100,0,1);
+  luciTeleportCooldown=Math.max(0,luciTeleportCooldown-dt);
+  luciRevealTime=Math.max(0,luciRevealTime-dt);
+  luciAttackCooldown=Math.max(0,luciAttackCooldown-dt);
+  luciPhase+=dt*(1+fear*2.5);
+  const dx=player.x-ghost.position.x,dz=player.z-ghost.position.z;
+  const distance=Math.hypot(dx,dz);
+  if(luciRevealTime>0){
+    ghost.visible=true;ghost.material.opacity=.72+Math.sin(luciPhase*7)*.18;
+    ghost.position.y=1.42+Math.sin(luciPhase*2)*.07;
+    ghost.lookAt(player.x,1.4,player.z);
+    if(distance<3.2&&luciAttackCooldown<=0){
+      // Alarm göstergesi kırmızı seviyedeyken yakın saldırı yapar.
+      if(backroomsAlert>=90)triggerLuciAttack();
+      luciPlaceAtDistance(8+Math.random()*4,-1);luciRevealTime=.7+Math.random()*.35;
+      luciAttackCooldown=Math.max(1.1,4.8-fear*3.3);luciTeleportCooldown=Math.max(.8,2.8-fear*1.7);
+      ghost.visible=false;
+    }
+    return;
+  }
+  ghost.visible=false;
+  if(luciTeleportCooldown<=0){
+    // Uykuyla birlikte daha yakin ve daha sik gorunur.
+    const interval=5.8-fear*4.2;
+    if(Math.random()<dt/Math.max(.8,interval)){
+      luciPlaceAtDistance(7.5-fear*3.2,Math.random()<.5?-1:1);
+      luciRevealTime=Math.max(.45,1.25-fear*.45);
+      luciTeleportCooldown=Math.max(.7,2.6-fear*1.7);
+      ghost.visible=true;
+    }
+  }
+}
+
 function updateBackroomsItems(dt){
   if(!backroomsActive)return;
   const hud=document.getElementById('backroomsHud'), counter=document.getElementById('waterCounter'), drink=document.getElementById('drinkButton');
@@ -2562,7 +2648,7 @@ function updateBackroomsItems(dt){
 
 function enterBackrooms(){
   forestActive=false;backroomsActive=true;collapseStarted=false;collapseTime=0;movementLocked=false;
-  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
+  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;luciRevealTime=0;luciTeleportCooldown=2;luciAttackCooldown=0;luciScareCooldown=0;luciCollapsing=false;luciCollapseTime=0;if(luciGhost)luciGhost.visible=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
   if(backroomsGuide)backroomsGuide.visible=false;
   startBackroomsAmbience();
   startBackroomsCreaks();
@@ -2844,6 +2930,8 @@ function animate(){
   updateMovement(dt);
   updateBackroomsEncounter(dt);
   updateBackroomsItems(dt);
+  updateLuciCollapse(dt);
+  updateLuciGhost(dt);
   updateSurvivalHud(dt);
   updateMentalState(dt);
   updateSleep(dt);
