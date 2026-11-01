@@ -179,7 +179,7 @@ document.getElementById('game').appendChild(renderer.domElement);
 const scene=new THREE.Scene();
 // Açılışta odanın ortasında beliren deney görevlisi.
 const petEntity=new THREE.Group();
-petEntity.scale.setScalar(0.09); // Oyun başında odada konuşan varlık ekstra küçük (yaklaşık 24 cm).
+petEntity.scale.setScalar(0.12); // Oyun başında odada konuşan varlık ekstra küçük (yaklaşık 24 cm).
 petEntity.position.set(0,0,1.25); // Başlangıç konuşmasında oyuncuya daha yakın.
 petEntity.visible=false;
 scene.add(petEntity);
