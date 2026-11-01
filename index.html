@@ -2762,9 +2762,15 @@ function updateSurvivalHud(dt){
   if(!forestActive)return;
   // Ormanda kalmak zamanla akil sagligini daha hizli tuketir.
   if(!collapseStarted&&!sleeping&&!waking) sanity=Math.max(0,sanity-0.22*dt);
-  const sprinting=(keys.ShiftLeft||keys.ShiftRight)&&(keys.KeyW||keys.KeyA||keys.KeyS||keys.KeyD||Math.abs(joyX)+Math.abs(joyY)>.12);
-  if(sprinting&&stamina>0&&!movementLocked&&!sleeping&&!waking){stamina=Math.max(0,stamina-29*dt);}
-  else{stamina=Math.min(100,stamina+(stamina<18?10:17)*dt);}
+  const sprintRequested=(keys.ShiftLeft||keys.ShiftRight)&&(keys.KeyW||keys.KeyA||keys.KeyS||keys.KeyD||Math.abs(joyX)+Math.abs(joyY)>.12);
+  const sprintAllowed=sprintRequested&&!movementLocked&&!sleeping&&!waking;
+  if(sprintAllowed){
+    // Dayanıklılık sıfırlandığında koşu tuşu basılı kalsa bile değer sabit kalır.
+    // Böylece sıfır ile çok küçük değerler arasında gidip gelerek hız/kamera titremesi oluşturmaz.
+    stamina=Math.max(0,stamina-29*dt);
+  }else{
+    stamina=Math.min(100,stamina+(stamina<18?10:17)*dt);
+  }
   const pct=Math.round(stamina), spd=stamina<20?Math.max(.48,1.05-stamina/30):1.05;
   staminaFill.style.width=pct+'%'; staminaValue.textContent=pct+'%';
   heartIcon.style.animationDuration=spd+'s';
@@ -2799,7 +2805,7 @@ function updateMovement(dt){
 
   const crouching=!!keys.KeyC;
   crouchAmount=THREE.MathUtils.damp(crouchAmount,crouching?1:0,9,dt);
-  const sprintRequested=keys.ShiftLeft||keys.ShiftRight;
+  const sprintRequested=(keys.ShiftLeft||keys.ShiftRight)&&length>.04;
   const actuallySprinting=sprintRequested&&stamina>0&&!crouching;
   const speed=(actuallySprinting?4.2:player.speed)*(crouching?.48:1)*(backroomsActive&&almondWaterSpeedBoost>0?1.45:1);
 
