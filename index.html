@@ -1880,6 +1880,8 @@ const CHUNK_SIZE=24, CHUNK_RADIUS=1;
 // İki dakika sonra karşıya çıkan beyaz, yüzü seçilmeyen ruhani yardımcı.
 function createBackroomsGuide(){
   const guide=new THREE.Group();
+  // Rehber varlık artık yaklaşık bir kedi boyutunda.
+  guide.scale.setScalar(.18);
   const white=new THREE.MeshBasicMaterial({color:0xf4f4ed,transparent:true,opacity:.92});
   const body=new THREE.Mesh(new THREE.CapsuleGeometry(.34,.95,5,8),white);body.position.y=1.25;guide.add(body);
   const head=new THREE.Mesh(new THREE.SphereGeometry(.29,12,10),white);head.position.y=2.12;guide.add(head);
