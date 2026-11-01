@@ -20,7 +20,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#171719;col
   80%{transform:translate(3px,-1px)}
   90%{transform:translate(-2px,1px)}
 }
-#game.entity-shake{animation:entityScreenShake .65s ease-in-out}
+#game.entity-shake{animation:entityScreenShake .95s ease-in-out}
 canvas{display:block}
 #hud{position:fixed;top:14px;left:14px;z-index:3;font-size:11px;letter-spacing:2px;text-shadow:1px 2px #000;pointer-events:none}
 #survivalHud{position:fixed;top:42px;left:14px;z-index:5;display:flex;flex-direction:column;gap:8px;pointer-events:none;font-family:monospace}
@@ -179,7 +179,7 @@ document.getElementById('game').appendChild(renderer.domElement);
 const scene=new THREE.Scene();
 // Açılışta odanın ortasında beliren deney görevlisi.
 const petEntity=new THREE.Group();
-petEntity.scale.setScalar(0.68); // Açılışta konuşan varlık daha küçük görünür.
+petEntity.scale.setScalar(0.09); // Oyun başında odada konuşan varlık ekstra küçük (yaklaşık 24 cm).
 petEntity.position.set(0,0,1.25); // Başlangıç konuşmasında oyuncuya daha yakın.
 petEntity.visible=false;
 scene.add(petEntity);
@@ -1405,6 +1405,30 @@ function showSubtitle(message){
 
 // Açılış diyaloğu: konuşmacı adı metin kutusunun sol üstünde görünür.
 let petIntroStarted=false;
+
+// Başlangıç odasında kesintisiz 2 dakika kalınırsa karakter tepki verir.
+let bedroomStayTimer=0;
+let bedroomStayTracking=false;
+let bedroomStayLineShown=false;
+function updateBedroomStayDialogue(dt){
+  if(!started || !bedroomStayTracking || bedroomStayLineShown || forestActive || backroomsActive || sleeping || sleepAnimation || waking) return;
+
+  // Başlangıç odasının kapı eşiği z=3.05; odadan çıkınca sayaç sıfırlanır.
+  const stillInBedroom=Math.abs(player.x)<3.65 && player.z<=3.05 && player.z>=-3.65;
+  if(!stillInBedroom){
+    bedroomStayTimer=0;
+    return;
+  }
+
+  bedroomStayTimer+=dt;
+  if(bedroomStayTimer>=120){
+    bedroomStayLineShown=true;
+    speakerName.textContent='KARAKTER';
+    speakerName.classList.add('visible');
+    showSubtitle('kardeşim bu oyun böyle bitmeyecek! kaldır şu götünü!!');
+    setTimeout(()=>speakerName.classList.remove('visible'),6500);
+  }
+}
 const speakerName=document.getElementById('speakerName');
 function waitIntro(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 function shakeIntroScreen(){
@@ -1412,7 +1436,7 @@ function shakeIntroScreen(){
   game.classList.remove('entity-shake');
   void game.offsetWidth;
   game.classList.add('entity-shake');
-  setTimeout(()=>game.classList.remove('entity-shake'),700);
+  setTimeout(()=>game.classList.remove('entity-shake'),1000);
 }
 async function playPetIntro(){
   if(petIntroStarted)return;
@@ -1423,21 +1447,27 @@ async function playPetIntro(){
     ['VARLIK SİLÜETİ','hoşgeldiniz!!'],
     ['VARLIK SİLÜETİ','deneylerimize katıldığınız için tebrik ederim!!'],
     ['VARLIK SİLÜETİ','size birşey olması durumunda... aileniz bize emanet!! içiniz rahat olabilir!'],
-    ['VARLIK SİLÜETİ','istediğmiz kitabı bulunca sizi geri getireceğiz uWu bayss']
+    ['VARLIK SİLÜETİ','Sen ciddi misin, beni kedi olarak mı hayal ediyorsun!']
   ];
   for(let i=0;i<lines.length;i++){
     const [speaker,message]=lines[i];
-    if(i===3)shakeIntroScreen();
     speakerName.textContent=speaker;
     speakerName.classList.add('visible');
     showSubtitle(message);
+    // Varlık son cümlesini bağırırken kamera/ekran sertçe sarsılır.
+    if(i===lines.length-1)shakeIntroScreen();
     // Harf animasyonu ve okuma süresi tamamlandıktan sonra sonraki repliğe geç.
     await waitIntro(Math.max(4500,message.length*42+2200)+1200);
   }
   speakerName.classList.remove('visible');
   subtitle.classList.remove('visible');
   petEntity.visible=false;
+  // Varlık tamamen kaybolduktan kısa süre sonra karakter kendi kendine konuşur.
+  await waitIntro(900);
+  showSubtitle('Burası benim odam... ama yeni eşyalar gelmiş..');
   movementLocked=false;
+  bedroomStayTimer=0;
+  bedroomStayTracking=true;
 }
 
 // ETKİLEŞİM MESAFELERİ
@@ -1880,8 +1910,6 @@ const CHUNK_SIZE=24, CHUNK_RADIUS=1;
 // İki dakika sonra karşıya çıkan beyaz, yüzü seçilmeyen ruhani yardımcı.
 function createBackroomsGuide(){
   const guide=new THREE.Group();
-  // Rehber varlık artık yaklaşık bir kedi boyutunda.
-  guide.scale.setScalar(.12);
   const white=new THREE.MeshBasicMaterial({color:0xf4f4ed,transparent:true,opacity:.92});
   const body=new THREE.Mesh(new THREE.CapsuleGeometry(.34,.95,5,8),white);body.position.y=1.25;guide.add(body);
   const head=new THREE.Mesh(new THREE.SphereGeometry(.29,12,10),white);head.position.y=2.12;guide.add(head);
@@ -2815,16 +2843,11 @@ function updateBackroomsEncounter(dt){
     {at:16,text:'Kendi zihninizde mahsur kaldınız.'},
     {at:20,text:'Güler... Bekler... Pardon, sadece alışkanlık.'},
     {at:27,text:'Size zamanı geldiğinde yardımcı olacağım.'},
-    {at:35,text:'Sen ciddi misin, beni kedi olarak mı hayal ediyorsun!'}
+    {at:35,text:'Şimdilik bu kadar. Fazla ses çıkarmamanızı tavsiye ederim, bay bay!'}
   ];
   if(backroomsEncounterStep<lines.length&&backroomsEncounterStepTime>=lines[backroomsEncounterStep].at){
     const line=lines[backroomsEncounterStep];showSubtitle(line.text);
     if(backroomsEncounterStep===1)backroomsEncounterWobble=1.8;
-    // Varlık kediye benzetilmesine öfkelenerek bağırırken ekran sarsılır.
-    if(backroomsEncounterStep===5){
-      shakeIntroScreen();
-      backroomsEncounterWobble=2.2;
-    }
     backroomsEncounterStep++;
   }
   if(backroomsEncounterWobble>0){
@@ -2832,11 +2855,9 @@ function updateBackroomsEncounter(dt){
     const amount=backroomsEncounterWobble>0?Math.sin(elapsed*48)*.045:0;
     camera.rotation.z=amount;
   }
-  if(backroomsEncounterStep>=lines.length&&backroomsEncounterStepTime>=45){
+  if(backroomsEncounterStep>=lines.length&&backroomsEncounterStepTime>=40){
     stalkerDialogueActive=false;movementLocked=false;
     if(backroomsGuide)backroomsGuide.visible=false;
-    // Varlık kaybolduktan sonra karakter odasını fark eder.
-    showSubtitle('Burası benim odam ama yeni eşyalar eklenmiş... Çok tuhaf...');
     guideFinished=true;spawnAlmondWaters();
   }
 }
@@ -3068,6 +3089,7 @@ function animate(){
   if(Math.abs(camera.fov-nextFov)>.001){camera.fov=nextFov;camera.updateProjectionMatrix();}
 
   updateMovement(dt);
+  updateBedroomStayDialogue(dt);
   updateBackroomsEncounter(dt);
   updateBackroomsItems(dt);
   updateLuciCollapse(dt);
