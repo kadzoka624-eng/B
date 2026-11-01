@@ -1881,7 +1881,7 @@ const CHUNK_SIZE=24, CHUNK_RADIUS=1;
 function createBackroomsGuide(){
   const guide=new THREE.Group();
   // Rehber varlık artık yaklaşık bir kedi boyutunda.
-  guide.scale.setScalar(.18);
+  guide.scale.setScalar(.12);
   const white=new THREE.MeshBasicMaterial({color:0xf4f4ed,transparent:true,opacity:.92});
   const body=new THREE.Mesh(new THREE.CapsuleGeometry(.34,.95,5,8),white);body.position.y=1.25;guide.add(body);
   const head=new THREE.Mesh(new THREE.SphereGeometry(.29,12,10),white);head.position.y=2.12;guide.add(head);
@@ -2815,11 +2815,16 @@ function updateBackroomsEncounter(dt){
     {at:16,text:'Kendi zihninizde mahsur kaldınız.'},
     {at:20,text:'Güler... Bekler... Pardon, sadece alışkanlık.'},
     {at:27,text:'Size zamanı geldiğinde yardımcı olacağım.'},
-    {at:35,text:'Şimdilik bu kadar. Fazla ses çıkarmamanızı tavsiye ederim, bay bay!'}
+    {at:35,text:'Sen ciddi misin, beni kedi olarak mı hayal ediyorsun!'}
   ];
   if(backroomsEncounterStep<lines.length&&backroomsEncounterStepTime>=lines[backroomsEncounterStep].at){
     const line=lines[backroomsEncounterStep];showSubtitle(line.text);
     if(backroomsEncounterStep===1)backroomsEncounterWobble=1.8;
+    // Varlık kediye benzetilmesine öfkelenerek bağırırken ekran sarsılır.
+    if(backroomsEncounterStep===5){
+      shakeIntroScreen();
+      backroomsEncounterWobble=2.2;
+    }
     backroomsEncounterStep++;
   }
   if(backroomsEncounterWobble>0){
@@ -2827,9 +2832,11 @@ function updateBackroomsEncounter(dt){
     const amount=backroomsEncounterWobble>0?Math.sin(elapsed*48)*.045:0;
     camera.rotation.z=amount;
   }
-  if(backroomsEncounterStep>=lines.length&&backroomsEncounterStepTime>=40){
+  if(backroomsEncounterStep>=lines.length&&backroomsEncounterStepTime>=45){
     stalkerDialogueActive=false;movementLocked=false;
     if(backroomsGuide)backroomsGuide.visible=false;
+    // Varlık kaybolduktan sonra karakter odasını fark eder.
+    showSubtitle('Burası benim odam ama yeni eşyalar eklenmiş... Çok tuhaf...');
     guideFinished=true;spawnAlmondWaters();
   }
 }
