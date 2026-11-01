@@ -56,6 +56,8 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 #lookArea{position:absolute;left:43%;right:0;top:0;bottom:0;pointer-events:auto;touch-action:none}
 #subtitle{position:fixed;z-index:8;left:50%;bottom:12%;transform:translateX(-50%);width:max-content;max-width:min(88vw,680px);min-height:0;padding:11px 19px;background:linear-gradient(135deg,rgba(8,12,16,.94),rgba(20,25,30,.91));border:1px solid #a9b6c044;border-left:3px solid #aeb8c4;color:#f3f1eb;font-size:14px;line-height:1.65;letter-spacing:.55px;text-align:center;text-shadow:1px 2px 3px #000;box-shadow:0 8px 28px #0008, inset 0 0 18px #ffffff08;backdrop-filter:blur(7px);border-radius:5px;pointer-events:none;opacity:0;transition:opacity .25s}
 #subtitle.visible{opacity:1}
+#speakerName{position:fixed;z-index:9;left:50%;bottom:calc(13% + 62px);transform:translateX(-50%);width:min(88vw,680px);padding:0 4px;color:#d8c7b3;font-size:11px;letter-spacing:2px;text-align:left;text-shadow:1px 2px 4px #000;display:none;pointer-events:none}
+#speakerName.visible{display:block}
 #tearOverlay{position:fixed;inset:0;z-index:6;pointer-events:none;opacity:0;overflow:hidden;transition:opacity 1s}
 #tearOverlay.active{opacity:1}
 .tear{position:absolute;top:-12%;width:3px;height:24vh;border-radius:0 0 5px 5px;background:linear-gradient(180deg,#9bdcff00,#9bdcffaa,#d8f4ff22);filter:blur(.5px);animation:tearFall 2.4s linear infinite}
@@ -115,6 +117,7 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 <div id="vignette"></div>
 <div id="mushroomTint"></div>
 <div id="blink"></div>
+<div id="speakerName" aria-live="polite"></div>
 <div id="subtitle"></div>
 <div id="tearOverlay"><i class="tear"></i><i class="tear"></i><i class="tear"></i><i class="tear"></i></div>
 <div id="eyelids"></div>
@@ -157,6 +160,19 @@ renderer.outputColorSpace=THREE.SRGBColorSpace;
 document.getElementById('game').appendChild(renderer.domElement);
 
 const scene=new THREE.Scene();
+// Açılışta odanın ortasında beliren deney görevlisi.
+const petEntity=new THREE.Group();
+petEntity.position.set(0,0,-0.65);
+petEntity.visible=false;
+scene.add(petEntity);
+const petTextureLoader=new THREE.TextureLoader();
+petTextureLoader.load('./pet/pet.png',texture=>{
+  texture.colorSpace=THREE.SRGBColorSpace;
+  const petMaterial=new THREE.MeshBasicMaterial({map:texture,transparent:true,alphaTest:0.04,side:THREE.DoubleSide,depthWrite:false});
+  const petSprite=new THREE.Mesh(new THREE.PlaneGeometry(1.75,2.65),petMaterial);
+  petSprite.position.y=1.32;
+  petEntity.add(petSprite);
+},undefined,error=>console.error('pet/pet.png yüklenemedi:',error));
 scene.background=new THREE.Color(0x55535a);
 scene.fog=new THREE.Fog(0x55535a,12,25);
 
@@ -1367,6 +1383,35 @@ function showSubtitle(message){
     clearInterval(subtitleTimer);
     subtitle.classList.remove('visible');
   },Math.max(4500,message.length*42+2200));
+}
+
+// Açılış diyaloğu: konuşmacı adı metin kutusunun sol üstünde görünür.
+let petIntroStarted=false;
+const speakerName=document.getElementById('speakerName');
+function waitIntro(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+async function playPetIntro(){
+  if(petIntroStarted)return;
+  petIntroStarted=true;
+  movementLocked=true;
+  petEntity.visible=true;
+  const lines=[
+    ['VARLIK SİLÜETİ','hosgeldinn!!',2300],
+    ['VARLIK SİLÜETİ','bir süre bekler ardından deneylerimize katıldığınız için sizi tebrik ediyorum uWu',4300],
+    ['VARLIK SİLÜETİ','bir süre bekleyip size birşey olsa bile ailenize iyi bakacağımızdan emin olabilirsiniz.',4700],
+    ['VARLIK SİLÜETİ','sonra şuan uykuya daldınız! bilinç altınızı istediğiniz gibi keşfe çıkabilirsiniz uwu.',4600],
+    ['VARLIK SİLÜETİ','ama dikkatli olun kabuslarınız size zarar vermesin! istediğimizi kitabı bulursanız otomatik bir şekilde uyanacaksınız! sadece ölmemeye dikkat edinn!!',6500],
+    ['PLAYER','Çok sinir bozucusun -_-',3000]
+  ];
+  for(const [speaker,message,duration] of lines){
+    speakerName.textContent=speaker;
+    speakerName.classList.add('visible');
+    showSubtitle(message);
+    await waitIntro(duration);
+  }
+  speakerName.classList.remove('visible');
+  subtitle.classList.remove('visible');
+  petEntity.visible=false;
+  movementLocked=false;
 }
 
 // ETKİLEŞİM MESAFELERİ
@@ -3032,6 +3077,7 @@ document.getElementById('noticeContinue').addEventListener('click',()=>{
   // Ses motorunu kullanicinin dogrudan tiklamasi sirasinda baslat.
   initAudio();
   started=true;
+  playPetIntro();
   // Ses dosyalarinin oynatma iznini kullanici tiklamasinda ac.
   unlockGameAudio();
   enableMotionShake();
