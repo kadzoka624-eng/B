@@ -1683,7 +1683,9 @@ renderer.domElement.addEventListener('pointerup',endDesktopLook);
 renderer.domElement.addEventListener('pointercancel',endDesktopLook);
 
 renderer.domElement.addEventListener('click',()=>{
-  if(started&&!movementLocked&&matchMedia('(pointer:fine)').matches&&document.pointerLockElement!==renderer.domElement){
+  // Açılış rehberi konuşurken de fare kilidi alınabilir; yalnızca bakış,
+  // uyuma/uyanma gibi zorunlu kamera animasyonlarında kilitlenir.
+  if(started&&!sleeping&&!sleepAnimation&&!waking&&matchMedia('(pointer:fine)').matches&&document.pointerLockElement!==renderer.domElement){
     renderer.domElement.requestPointerLock();
   }
 });
@@ -2881,7 +2883,15 @@ function updateSurvivalHud(dt){
 
 // HAREKET
 function updateMovement(dt){
-  if(!started||movementLocked||sleeping||sleepAnimation||waking)return;
+  if(!started)return;
+
+  // Rehber varlık konuşurken hareket kilitli kalır; ancak kamera serbesttir.
+  // Bu nedenle oyuncu konumunu değiştirmeden bakış yönünü her kare kameraya uygula.
+  if(movementLocked||sleeping||sleepAnimation||waking){
+    camera.position.set(player.x,player.y+cameraBob-.72*crouchAmount,player.z);
+    camera.rotation.set(player.pitch,player.yaw,0,'YXZ');
+    return;
+  }
 
   let forward=0;
   let side=0;
