@@ -180,7 +180,7 @@ const scene=new THREE.Scene();
 // Açılışta odanın ortasında beliren deney görevlisi.
 const petEntity=new THREE.Group();
 petEntity.scale.setScalar(0.68); // Açılışta konuşan varlık daha küçük görünür.
-petEntity.position.set(0,0,-0.65);
+petEntity.position.set(0,0,1.25); // Başlangıç konuşmasında oyuncuya daha yakın.
 petEntity.visible=false;
 scene.add(petEntity);
 const petTextureLoader=new THREE.TextureLoader();
@@ -1648,12 +1648,39 @@ addEventListener('keyup',e=>{
 });
 
 addEventListener('mousemove',e=>{
-  if(!started||movementLocked||document.pointerLockElement!==renderer.domElement)return;
+  if(!started||document.pointerLockElement!==renderer.domElement)return;
 
   player.yaw-=e.movementX*.002;
   player.pitch-=e.movementY*.0017;
   player.pitch=THREE.MathUtils.clamp(player.pitch,-1.25,1.25);
 });
+
+// Masaüstünde fareyle basılı tutup sürükleyerek de kamerayı çevirebilirsin.
+let desktopLookPointerId=null;
+let desktopLookLastX=0;
+let desktopLookLastY=0;
+renderer.domElement.addEventListener('pointerdown',e=>{
+  if(!started||!matchMedia('(pointer:fine)').matches||document.pointerLockElement===renderer.domElement)return;
+  desktopLookPointerId=e.pointerId;
+  desktopLookLastX=e.clientX;
+  desktopLookLastY=e.clientY;
+  try{renderer.domElement.setPointerCapture(e.pointerId);}catch(_){}
+});
+renderer.domElement.addEventListener('pointermove',e=>{
+  if(e.pointerId!==desktopLookPointerId||!started||document.pointerLockElement===renderer.domElement)return;
+  const dx=e.clientX-desktopLookLastX;
+  const dy=e.clientY-desktopLookLastY;
+  player.yaw-=dx*.005;
+  player.pitch-=dy*.0035;
+  player.pitch=THREE.MathUtils.clamp(player.pitch,-1.25,1.25);
+  desktopLookLastX=e.clientX;
+  desktopLookLastY=e.clientY;
+});
+function endDesktopLook(e){
+  if(e.pointerId===desktopLookPointerId)desktopLookPointerId=null;
+}
+renderer.domElement.addEventListener('pointerup',endDesktopLook);
+renderer.domElement.addEventListener('pointercancel',endDesktopLook);
 
 renderer.domElement.addEventListener('click',()=>{
   if(started&&!movementLocked&&matchMedia('(pointer:fine)').matches&&document.pointerLockElement!==renderer.domElement){
@@ -1726,7 +1753,7 @@ let lastX=0;
 let lastY=0;
 
 lookArea.addEventListener('pointerdown',e=>{
-  if(!started||movementLocked)return;
+  if(!started)return;
 
   lookId=e.pointerId;
   lastX=e.clientX;
@@ -1736,7 +1763,7 @@ lookArea.addEventListener('pointerdown',e=>{
 });
 
 lookArea.addEventListener('pointermove',e=>{
-  if(e.pointerId!==lookId||!started||movementLocked)return;
+  if(e.pointerId!==lookId||!started)return;
 
   player.yaw-=(e.clientX-lastX)*.007;
   player.pitch-=(e.clientY-lastY)*.004;
