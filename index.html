@@ -2369,17 +2369,25 @@ flashlightFill.position.set(0,-.12,-.25);
 forestScene.add(flashlightFill);
 let flashlightOn=false;
 let flashlightAnim=0;
-// GitHub deposundaki ısık/ısık.wav dosyası fener açılıp kapanırken çalar.
-const flashlightSwitchAudio=new Audio('./ısık/ısık.wav');
+// Fener sesi: her açma/kapatma işleminde dosyayı doğrudan kullanıcı
+// etkileşimi içinde başlat. Türkçe karakterli klasör adı URL kodlamasıyla verilir.
+const flashlightSwitchAudio=new Audio('./%C4%B1s%C4%B1k/%C4%B1s%C4%B1k.wav');
 flashlightSwitchAudio.preload='auto';
-flashlightSwitchAudio.volume=0.72;
+flashlightSwitchAudio.volume=0.9;
+flashlightSwitchAudio.addEventListener('error',()=>{
+  console.error('Fener sesi yüklenemedi. Dosya yolu ve büyük/küçük harfleri kontrol et:',flashlightSwitchAudio.currentSrc||flashlightSwitchAudio.src,flashlightSwitchAudio.error);
+});
 function playFlashlightSwitchSound(){
   try{
     flashlightSwitchAudio.pause();
     flashlightSwitchAudio.currentTime=0;
     const playback=flashlightSwitchAudio.play();
-    if(playback&&typeof playback.catch==='function')playback.catch(()=>{});
-  }catch(error){/* Ses yüklenemezse fener işlevi devam eder. */}
+    if(playback&&typeof playback.catch==='function')playback.catch(error=>{
+      console.warn('Fener sesi oynatılamadı:',flashlightSwitchAudio.currentSrc||flashlightSwitchAudio.src,error);
+    });
+  }catch(error){
+    console.warn('Fener sesi başlatılamadı:',error);
+  }
 }
 function toggleFlashlight(){
   if(!started||(!forestActive&&!backroomsActive))return;
