@@ -38,7 +38,7 @@ canvas{display:block}
 #backroomsHud{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:6;width:min(270px,42vw);display:none;pointer-events:none;text-align:center;font-size:10px;letter-spacing:2px;color:#d8d0ad;text-shadow:0 2px 5px #000}
 #sleepTrack{height:10px;margin-top:7px;padding:1px;background:#080907;border:1px solid #a99a6d88;box-shadow:0 2px 10px #0009}
 #sleepFill{height:100%;width:0;background:linear-gradient(90deg,#8c9a70,#d4b76f,#b34c3e);transition:width .2s linear}
-#alertHud{position:fixed;top:92px;left:14px;z-index:7;display:none;width:118px;padding:7px 9px;background:rgba(12,10,9,.86);border:1px solid #b99b7a88;color:#e9d8c3;font-size:12px;letter-spacing:2px;pointer-events:none;text-shadow:0 1px 4px #000}#alertTrack{height:7px;margin-top:6px;background:#080707;border:1px solid #80685b;overflow:hidden}#alertFill{height:100%;width:0;background:linear-gradient(90deg,#b18a58,#c94d36,#ff241c);box-shadow:0 0 8px #e43b2d;transition:width .12s linear}#sprintBtn{width:70px;height:48px;border-radius:15px;font-size:24px;background:#273126e8;border:1px solid #b9c9a099;box-shadow:0 3px 12px #0008;touch-action:none}#sprintBtn.active{background:#a8bd83;color:#111;border-color:#efffd4;box-shadow:0 0 18px #a8bd8388}#waterCounter{position:fixed;top:14px;right:16px;z-index:6;display:none;padding:9px 12px;background:rgba(8,13,16,.88);border:1px solid #91b7c477;color:#e0e8e9;font-size:12px;letter-spacing:1px;pointer-events:none}#drinkButton{display:none;position:fixed;top:54px;right:16px;z-index:12;width:34px;height:30px;background:#182126eF;border:1px solid #b8c7bd99;color:#fff;font-size:15px;cursor:pointer;pointer-events:auto}#drinkFlash{display:none;position:fixed;left:50%;top:58%;transform:translate(-50%,-50%);z-index:13;padding:14px 20px;background:#101719eF;border:1px solid #b8c7bd99;color:#e7eddf;letter-spacing:2px;font-size:12px;pointer-events:none}#drinkFlash.show{display:block;animation:drinkAnim .9s ease both}@keyframes drinkAnim{0%{opacity:0;transform:translate(-50%,-35%) scale(.7)}20%,75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-70%) scale(.9)}}
+#alertHud{position:fixed;top:92px;left:14px;z-index:7;display:none;width:118px;padding:7px 9px;background:rgba(12,10,9,.86);border:1px solid #b99b7a88;color:#e9d8c3;font-size:12px;letter-spacing:2px;pointer-events:none;text-shadow:0 1px 4px #000}#alertTrack{height:7px;margin-top:6px;background:#080707;border:1px solid #80685b;overflow:hidden}#alertFill{height:100%;width:0;background:linear-gradient(90deg,#b18a58,#c94d36,#ff241c);box-shadow:0 0 8px #e43b2d;transition:width .12s linear}#sprintBtn{width:70px;height:48px;border-radius:15px;font-size:24px;background:#273126e8;border:1px solid #b9c9a099;box-shadow:0 3px 12px #0008;touch-action:none}#sprintBtn.active{background:#a8bd83;color:#111;border-color:#efffd4;box-shadow:0 0 18px #a8bd8388}#waterCounter{position:fixed;top:14px;right:16px;z-index:6;display:none;padding:9px 12px;background:rgba(8,13,16,.88);border:1px solid #91b7c477;color:#e0e8e9;font-size:12px;letter-spacing:1px;pointer-events:none}#drinkButton{display:none;position:fixed;top:54px;right:16px;z-index:12;width:34px;height:30px;background:#182126eF;border:1px solid #b8c7bd99;color:#fff;font-size:15px;cursor:pointer;pointer-events:auto}#drinkFlash{display:none;position:fixed;right:16px;bottom:58px;left:auto;top:auto;transform:none;z-index:13;padding:10px 14px;background:rgba(12,16,18,.92);border:1px solid #b8c7bd88;color:#e7eddf;letter-spacing:1.5px;font-size:11px;pointer-events:none;max-width:min(70vw,280px);text-align:right}#drinkFlash.show{display:block;animation:drinkAnim .9s ease both}@keyframes drinkAnim{0%{opacity:0;transform:translateY(10px) scale(.92)}20%,75%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-8px) scale(.96)}}#pickupToast{display:none;position:fixed;right:16px;bottom:18px;z-index:13;padding:10px 14px;background:rgba(12,16,18,.92);border:1px solid #91b7c477;color:#e0e8e9;letter-spacing:1.2px;font-size:11px;pointer-events:none;max-width:min(70vw,280px);text-align:right;box-shadow:0 4px 18px #0008}#pickupToast.show{display:block;animation:pickupToastAnim 2.4s ease both}@keyframes pickupToastAnim{0%{opacity:0;transform:translateY(12px)}12%,78%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
 #crosshair{position:fixed;top:50%;left:50%;width:4px;height:4px;background:white;transform:translate(-50%,-50%);pointer-events:none}
 #hint{display:none!important}
 #vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse,transparent 55%,#0007 100%)}
@@ -126,7 +126,7 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 <div id="backroomsHud">UYKU<div id="sleepTrack"><div id="sleepFill"></div></div></div>
 <div id="alertHud">!<div id="alertTrack"><div id="alertFill"></div></div></div>
 <div id="waterCounter">ENERJİ İÇECEĞİ: <span id="waterCountHud">0</span></div>
-<button id="drinkButton" type="button" aria-label="Enerji içeceği iç">X</button><div id="drinkFlash">İÇİLİYOR...</div>
+<button id="drinkButton" type="button" aria-label="Enerji içeceği iç">X</button><div id="drinkFlash">İÇİLİYOR...</div><div id="pickupToast" aria-live="polite"></div>
 <div id="crosshair"></div>
 <div id="hint">WASD: HAREKET · MOUSE: BAKIŞ</div>
 <div id="vignette"></div>
@@ -1452,6 +1452,16 @@ function playScream(){
 }
 
 // ALTYAZI
+function showPickupToast(message){
+  const el=document.getElementById('pickupToast');
+  if(!el)return;
+  el.textContent=message;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  clearTimeout(showPickupToast.hideTimer);
+  showPickupToast.hideTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
 function showSubtitle(message, typingSpeed=28){
   clearInterval(subtitleTimer);
   subtitle.innerHTML='';
@@ -2062,8 +2072,8 @@ backroomsScene.fog=new THREE.Fog(0x242116,9,31);
 backroomsScene.add(new THREE.HemisphereLight(0x8b8051,0x211d13,.30));
 const backLight=new THREE.PointLight(0xffefad,.28,13);backLight.position.set(0,3.55,0);backroomsScene.add(backLight);
 // Backrooms sahnesinde de çalışan el feneri ışıkları.
-const backroomsFlashlight=new THREE.SpotLight(0xeaf2ff,0,20,Math.PI/3,.22,1);
-const backroomsFlashlightFill=new THREE.PointLight(0xdce9ff,0,7,2);
+const backroomsFlashlight=new THREE.SpotLight(0xb8b8b8,0,20,Math.PI/3,.22,1);
+const backroomsFlashlightFill=new THREE.PointLight(0xa8a8a8,0,7,2);
 backroomsScene.add(backroomsFlashlight,backroomsFlashlight.target,backroomsFlashlightFill);
 const backroomsColliders=[];
 const backGraffitiTexts=[
@@ -2737,34 +2747,34 @@ flashlightRig.rotation.set(-.12,-.10,-.10);
 camera.add(flashlightRig);
 const flashlightBody=new THREE.Mesh(
   new THREE.CylinderGeometry(.045,.065,.34,8),
-  new THREE.MeshStandardMaterial({color:0x252a30,roughness:.62,metalness:.55})
+  new THREE.MeshStandardMaterial({color:0x5a5a5a,roughness:.55,metalness:.45})
 );
 flashlightBody.rotation.x=Math.PI/2;
 flashlightBody.position.z=.06;
 flashlightRig.add(flashlightBody);
 const flashlightHead=new THREE.Mesh(
   new THREE.CylinderGeometry(.075,.055,.10,10),
-  new THREE.MeshStandardMaterial({color:0x414953,roughness:.45,metalness:.65})
+  new THREE.MeshStandardMaterial({color:0x6e6e6e,roughness:.42,metalness:.5})
 );
 flashlightHead.rotation.x=Math.PI/2;
 flashlightHead.position.z=-.13;
 flashlightRig.add(flashlightHead);
 const flashlightLens=new THREE.Mesh(
   new THREE.CircleGeometry(.057,12),
-  new THREE.MeshBasicMaterial({color:0xdcecff})
+  new THREE.MeshBasicMaterial({color:0xb0b0b0})
 );
 flashlightLens.position.z=-.184;
 flashlightRig.add(flashlightLens);
 flashlightRig.visible=false;
 
 // Işık kameranın tam önünden çıkar. Hedef kameraya bağlı olduğu için her yönde doğru döner.
-const forestFlashlight=new THREE.SpotLight(0xeaf2ff,0,20,Math.PI/3,.22,1.0);
+const forestFlashlight=new THREE.SpotLight(0xb8b8b8,0,20,Math.PI/3,.22,1.0);
 forestFlashlight.position.set(0,0,0);
 forestFlashlight.target.position.set(0,0,-1);
 forestFlashlight.castShadow=false;
 forestScene.add(forestFlashlight,forestFlashlight.target);
 // Yere ve yakındaki ağaçlara dolgu ışığı verir.
-const flashlightFill=new THREE.PointLight(0xdce9ff,0,7,2);
+const flashlightFill=new THREE.PointLight(0xa8a8a8,0,7,2);
 flashlightFill.position.set(0,-.12,-.25);
 forestScene.add(flashlightFill);
 let flashlightOn=false;
@@ -2804,7 +2814,7 @@ function toggleFlashlight(){
     flashlightRig.position.set(.48,-.48,-.38);
     flashlightRig.rotation.set(-1.05,-.28,-.32);
   }
-  flashlightLens.material.color.setHex(flashlightOn?0xffffff:0x87909a);
+  flashlightLens.material.color.setHex(flashlightOn?0xc8c8c8:0x6a6a6a);
   const button=document.getElementById('flashlightBtn');
   button.classList.toggle('on',flashlightOn);
   button.setAttribute('aria-label',flashlightOn?'El fenerini kapat':'El fenerini aç');
@@ -2960,12 +2970,13 @@ function drinkEnergy(){
   almondWaterSpeedBoost=5;
   drinkAnimating=true;drinkAnimationTime=1.85;drinkAnimT=0;
   drinkCanRig.visible=true;
-  drinkCanRig.position.set(.42,-.45,-.35);
-  drinkCanRig.rotation.set(-.2,.15,-.35);
+  // Sol el: negatif X
+  drinkCanRig.position.set(-.42,-.45,-.35);
+  drinkCanRig.rotation.set(-.2,-.15,.35);
   drinkCanRig.scale.setScalar(.9);
   const flash=document.getElementById('drinkFlash');flash.classList.remove('show');void flash.offsetWidth;flash.classList.add('show');
   document.getElementById('drinkButton').disabled=true;
-  showSubtitle('Enerji içeceğini içtin. Uykun açıldı.');
+  showPickupToast('Enerji içeceğini içtin. Uykun açıldı.');
 }
 function updateDrinkAnimation(dt){
   if(!drinkAnimating){
@@ -2974,40 +2985,40 @@ function updateDrinkAnimation(dt){
   }
   drinkAnimT+=dt;
   const t=drinkAnimT;
-  // 0-0.4: kola elden ağza yükselir
+  // 0-0.4: sol elden ağza yükselir
   if(t<.4){
     const k=t/.4;
     const e=1-Math.pow(1-k,2);
     drinkCanRig.position.set(
-      THREE.MathUtils.lerp(.42,.12,e),
+      THREE.MathUtils.lerp(-.42,-.14,e),
       THREE.MathUtils.lerp(-.45,-.08,e),
       THREE.MathUtils.lerp(-.35,-.28,e)
     );
     drinkCanRig.rotation.set(
       THREE.MathUtils.lerp(-.2,-1.05,e),
-      THREE.MathUtils.lerp(.15,0,e),
-      THREE.MathUtils.lerp(-.35,-.1,e)
+      THREE.MathUtils.lerp(-.15,0,e),
+      THREE.MathUtils.lerp(.35,.1,e)
     );
     drinkCanRig.scale.setScalar(.9+.15*e);
   }else if(t<1.15){
-    // 0.4-1.15: içer, hafif sallanır
+    // 0.4-1.15: içer, hafif sallanır (sol taraf)
     const k=(t-.4)/.75;
-    drinkCanRig.position.set(.12,-.08+Math.sin(k*Math.PI*3)*.012,-.28);
-    drinkCanRig.rotation.set(-1.05-Math.sin(k*Math.PI)*.12,Math.sin(k*8)*.03,-.1);
+    drinkCanRig.position.set(-.14,-.08+Math.sin(k*Math.PI*3)*.012,-.28);
+    drinkCanRig.rotation.set(-1.05-Math.sin(k*Math.PI)*.12,Math.sin(k*8)*.03,.1);
     drinkCanRig.scale.setScalar(1.05);
   }else if(t<1.85){
-    // 1.15-1.85: indirip kaybolur
+    // 1.15-1.85: sol ele indirip kaybolur
     const k=(t-1.15)/.7;
     const e=k*k;
     drinkCanRig.position.set(
-      THREE.MathUtils.lerp(.12,.48,e),
+      THREE.MathUtils.lerp(-.14,-.48,e),
       THREE.MathUtils.lerp(-.08,-.55,e),
       THREE.MathUtils.lerp(-.28,-.4,e)
     );
     drinkCanRig.rotation.set(
       THREE.MathUtils.lerp(-1.05,-.3,e),
-      .1,
-      THREE.MathUtils.lerp(-.1,-.4,e)
+      -.1,
+      THREE.MathUtils.lerp(.1,.4,e)
     );
     drinkCanRig.scale.setScalar(1.05-.4*e);
     if(k>.85)drinkCanRig.visible=false;
@@ -3068,48 +3079,48 @@ const luciExchanges=[
   // 1 — isim
   [
     {who:'luci',text:'Adım Luci. Unutma... buradan sonra her şey değişir.',revealName:true},
-    {who:'player',text:'Luci mi? Ne istiyorsun?'},
+    {who:'player',text:'Luci mi? Sen neredesin lan? Görünmeden mi konuşuyorsun?'},
     {who:'luci',text:'İstemiyorum. Sadece izliyorum. İzlemek yeter.'}
   ],
   // 2
   [
-    {who:'player',text:'Neden benimle konuşuyorsun?'},
+    {who:'player',text:'Nerden konuşuyorsun? Sesin her yerden geliyor!'},
     {who:'luci',text:'Çünkü yeni denekler hep soru sorar. Eğlenceli oluyor.'},
     {who:'luci',text:'Sen de sor. Ben de güleyim.'}
   ],
   // 3
   [
     {who:'luci',text:'Aradığın şeyi biliyorum.'},
-    {who:'player',text:'O zaman söyle!'},
+    {who:'player',text:'Söyle de göreyim seni! Nerdesin?'},
     {who:'luci',text:'Söylesem aramak biter. Aramak senin tek bağın.'}
   ],
   // 4
   [
-    {who:'player',text:'Ne aradığımı bile bilmiyorum...'},
+    {who:'player',text:'Ne aradığımı bilmiyorum... Sen de çık karşıma, konuş.'},
     {who:'luci',text:'İşte bu yüzden seçildin. Boşluk, iyi bir denek malzemesi.'},
     {who:'luci',text:'İpucu vereyim: aradığın şey burada değil. Ama buradan geçiyor.'}
   ],
   // 5
   [
     {who:'luci',text:'Bir zamanlar ben de koridorlarda yürüdüm. Tıpkı senin gibi.'},
-    {who:'player',text:'Sen de mi denekin?'},
+    {who:'player',text:'Sen de mi denekdin? Çık da yüzüne bakayım!'},
     {who:'luci',text:'Denektim. Sonra denek bitti, ben kaldım.'}
   ],
   // 6
   [
-    {who:'player',text:'Nasıl kaldın? Ne oldu sana?'},
+    {who:'player',text:'Nasıl kaldın? Ne oldu sana? Neredesin şimdi?'},
     {who:'luci',text:'Unuttum kim olduğumu. Unutunca yer açıldı. Ben o boşluğa oturdum.'},
     {who:'luci',text:'Sen de unutursan yerin hazır.'}
   ],
   // 7
   [
     {who:'luci',text:'Deneylerin amacı basit: sınır.'},
-    {who:'player',text:'Hangi sınır?'},
+    {who:'player',text:'Hangi sınır? Sen hangi köşeden fısıldıyorsun?'},
     {who:'luci',text:'Bilinç ile çöküş arasındaki ince çizgi. Siz o çizgide savruluyorsunuz.'}
   ],
   // 8
   [
-    {who:'player',text:'Kim yapıyor bu deneyleri?'},
+    {who:'player',text:'Kim yapıyor bu deneyleri? Sen kimsin, nerdesin?'},
     {who:'luci',text:'İsimleri yok. Laboratuvar da yok. Sadece seçim var.'},
     {who:'luci',text:'Sen seçildin. Ben sonuç oldum. Fark bu.'}
   ],
@@ -3121,7 +3132,7 @@ const luciExchanges=[
   ],
   // 10
   [
-    {who:'player',text:'Önceki denekler neden burada?'},
+    {who:'player',text:'Önceki denekler neden burada? Sen onlardan biri misin, neredesin?'},
     {who:'luci',text:'Aynı sebeple: bir şey arıyorlardı. Bulamadılar.'},
     {who:'luci',text:'Bulamayınca birbirlerine döndüler. Sonra bana.'}
   ],
@@ -3133,19 +3144,19 @@ const luciExchanges=[
   ],
   // 12
   [
-    {who:'player',text:'Sen benim bilinç altımın bir parçasısın.'},
+    {who:'player',text:'Sen benim bilinç altımın bir parçasısın... O yüzden mi görünmüyorsun?'},
     {who:'luci',text:'Ha! Ne tatlı. Her denek aynı teoriyi kurar.'},
     {who:'luci',text:'Bilinçaltın olsaydım nazik olurdum. Ben değilim.'}
   ],
   // 13
   [
     {who:'luci',text:'Bilinçaltın parçası mı? Ben senin korkunun kiracısıyım.'},
-    {who:'player',text:'Dalga geçme.'},
+    {who:'player',text:'Dalga geçme. Çık karşıma, merdenden konuşma!'},
     {who:'luci',text:'Dalga geçmiyorum. Eğleniyorum. Farkı öğren.'}
   ],
   // 14
   [
-    {who:'player',text:'Neden ışıklar titriyor?'},
+    {who:'player',text:'Neden ışıklar titriyor? Yakında mısın, nerdesin?'},
     {who:'luci',text:'Yaklaşınca titrer. Uzaklaşınca susar. Basit fizik... benim fizik.'},
     {who:'luci',text:'Titreme bir selamdır. Alış.'}
   ],
@@ -3157,14 +3168,14 @@ const luciExchanges=[
   ],
   // 16
   [
-    {who:'player',text:'Çıkış nerede?'},
+    {who:'player',text:'Çıkış nerede? Sen nerdesin, çıkışı biliyorsan göster!'},
     {who:'luci',text:'Çıkış arayanlar hep aynı köşeye döner.'},
     {who:'luci',text:'Aradığın şey çıkış değil. Çıkış sandığın şey seni burada tutuyor.'}
   ],
   // 17
   [
     {who:'luci',text:'Deney bitti sanıyorsunuz ya... asıl deney unutma.'},
-    {who:'player',text:'Ne demek unutma?'},
+    {who:'player',text:'Ne demek unutma? Sen nerden biliyorsun bunları?'},
     {who:'luci',text:'Kim olduğunu unutursan ölçüm tamamlanır. Ben o ölçümün artığıyım.'}
   ],
   // 18
@@ -3200,12 +3211,12 @@ const luciExchanges=[
   // 23
   [
     {who:'luci',text:'Ben bir gece aynada kendimi aradım. Ayna boştu.'},
-    {who:'player',text:'Ne gördün?'},
+    {who:'player',text:'Ne gördün? Hâlâ görünmüyorsun, nerdesin lan?'},
     {who:'luci',text:'Seni. Daha gelmemiştin ama yerin hazırdı.'}
   ],
   // 24
   [
-    {who:'player',text:'Bu labirent sonsuz mu?'},
+    {who:'player',text:'Bu labirent sonsuz mu? Sen hangi koridordasın?'},
     {who:'luci',text:'Sonsuz değil. Sen bitene kadar uzun.'},
     {who:'luci',text:'Bitince kısa gelir. Geçmiş gibi. Herkese öyle olur.'}
   ],
@@ -3217,91 +3228,91 @@ const luciExchanges=[
   ],
   // 26
   [
-    {who:'player',text:'Sen gerçekten bilinçaltım değilsin o zaman.'},
+    {who:'player',text:'Bilinçaltım değilsen neden görünmeden konuşuyorsun?'},
     {who:'luci',text:'Değilim. Ama senin bilinçaltın beni davet etti.'},
     {who:'luci',text:'Kapıyı sen açtın. Ben sadece içeri süzüldüm.'}
   ],
   // 27
   [
     {who:'luci',text:'Aradığın şey... bir isim gibi duruyor bazen.'},
-    {who:'player',text:'Kimin ismi?'},
+    {who:'player',text:'Kimin ismi? Söyle, çık karşıma!'},
     {who:'luci',text:'Söylemem. Söylersem arama biter, sen de bitersin.'}
   ],
   // 28
   [
-    {who:'player',text:'Neden benimle dalga geçiyorsun sürekli?'},
+    {who:'player',text:'Neden dalga geçiyorsun? Cesaretin yok da ondan gizliyorsun kendini!'},
     {who:'luci',text:'Çünkü hâlâ umut ediyorsun. Umut burada gülünçtür.'},
     {who:'luci',text:'Gülünç olan şeyler beni canlı tutar.'}
   ],
   // 29
   [
     {who:'luci',text:'Bir denek bana "defol" demişti. Defolmadım.'},
-    {who:'player',text:'Ben de diyorum: defol.'},
+    {who:'player',text:'Defol dedim! Nerdesin, çık da defol!'},
     {who:'luci',text:'Duydum. Hâlâ buradayım. Komik değil mi?'}
   ],
   // 30
   [
-    {who:'player',text:'Bu deneyler kime yarıyor?'},
+    {who:'player',text:'Bu deneyler kime yarıyor? Sen kime hizmet ediyorsun, nerdesin?'},
     {who:'luci',text:'Sonuca. Sonuç bazen ben oluyorum, bazen sessizlik.'},
     {who:'luci',text:'Sen hangi sonuç olacaksın, henüz belli değil.'}
   ],
   // 31
   [
     {who:'luci',text:'Kemikleri gördün. İsimleri yok. İsimler önce gider.'},
-    {who:'player',text:'Ben unutturmam kendimi.'},
+    {who:'player',text:'Ben unutturmam kendimi. Sen de saklanma, çık!'},
     {who:'luci',text:'Herkes öyle der. Sonra duvara yazar, yazar... kaybolur.'}
   ],
   // 32
   [
-    {who:'player',text:'Aradığım şey hakkında bir şey daha söyle.'},
+    {who:'player',text:'Bir şey daha söyle... ama bu sefer görünerek söyle.'},
     {who:'luci',text:'Yaklaştıkça soğur. Uzaklaştıkça yanar.'},
     {who:'luci',text:'Bu kadar. Fazlası spoiler... ve spoiler öldürür.'}
   ],
   // 33
   [
     {who:'luci',text:'Ben uyumadım yıllarca. Uyuyunca kayboldum.'},
-    {who:'player',text:'Uyursam ne olur?'},
+    {who:'player',text:'Uyursam ne olur? Sen uyurken mi yaklaşıyorsun, nerdesin?'},
     {who:'luci',text:'Bana kalırsın. Bu cümleyi seviyor um.'}
   ],
   // 34
   [
-    {who:'player',text:'Ruhani rehber çıkış arayacağını söylemişti.'},
+    {who:'player',text:'Rehber çıkış arayacaktı. Sen de rehber misin, yoksa nerden konuşuyorsun?'},
     {who:'luci',text:'Rehber mi? Tatlı. O da bir maske.'},
     {who:'luci',text:'Maskeler burada çok. Sen de bir tane takıyorsun: "kahraman".'}
   ],
   // 35
   [
     {who:'luci',text:'Denek 7 "bu sadece rüya" diye bağırdı.'},
-    {who:'player',text:'Belki de rüya.'},
+    {who:'player',text:'Belki rüya... Rüyada da görünmeden mi konuşursun?'},
     {who:'luci',text:'Rüya diye tutunmak da bir denek refleksi. Tebrikler.'}
   ],
   // 36
   [
-    {who:'player',text:'Sen hiç insan oldun mu, Luci?'},
+    {who:'player',text:'Sen hiç insan oldun mu, Luci? İnsanlar görünür en azından!'},
     {who:'luci',text:'Oldum. Sonra insan kelimesi yetmedi.'},
     {who:'luci',text:'Şimdi senin adımlarını sayıyorum. Eski hobim.'}
   ],
   // 37
   [
     {who:'luci',text:'Aradığın şey seni burada tutuyor. Bırakırsan düşersin.'},
-    {who:'player',text:'Bırakmayacağım.'},
+    {who:'player',text:'Bırakmayacağım. Sen de saklanmayı bırak, nerdesin?'},
     {who:'luci',text:'Bırakmayanlar en çok kırılanlardı. Bakalım.'}
   ],
   // 38
   [
-    {who:'player',text:'Bu konuşmalar neye yarıyor?'},
+    {who:'player',text:'Bu konuşmalar neye yarıyor? Gölgeden nutuk mu çekiyorsun?'},
     {who:'luci',text:'Seni yormaya. Yorgun denek daha çabuk unutur.'},
     {who:'luci',text:'Yorul, unut, kaybol. Tarif bu. Basit ve etkili.'}
   ],
   // 39
   [
     {who:'luci',text:'Bir gün ismini soracağım. Cevap veremezsen iş bitmiş demektir.'},
-    {who:'player',text:'Adımı biliyorum.'},
+    {who:'player',text:'Adımı biliyorum. Senin yerini bilmiyorum, söyle!'},
     {who:'luci',text:'Şimdilik. Denek 22 son gününde kendi adını sormuştu bana.'}
   ],
   // 40
   [
-    {who:'player',text:'Bir daha asla buraya gelmem.'},
+    {who:'player',text:'Bir daha gelmem... Sen de bir daha gölgeden konuşma, nerdesin lan?'},
     {who:'luci',text:'Gelmemek için önce çıkman lazım.'},
     {who:'luci',text:'Çıkamayanlar hep aynı cümleyi kurardı. Sen de kurdun. Hoşça kal... şimdilik.'}
   ]
@@ -3555,7 +3566,7 @@ function updateBackroomsItems(dt){
     if(almondWaterCount<10&&Math.hypot(player.x-item.position.x,player.z-item.position.z)<1.05){
       item.userData.collected=true;item.visible=false;almondWaterCount++;
       document.getElementById('waterCountHud').textContent=String(almondWaterCount);
-      showSubtitle(item.userData.rare?'Nadir enerji içeceği buldun.':'Enerji içeceği buldun.');
+      showPickupToast(item.userData.rare?'Nadir enerji içeceği buldun.':'Enerji içeceği buldun.');
     }
   }
 }
