@@ -863,50 +863,64 @@ const flowerCore=new THREE.Mesh(new THREE.IcosahedronGeometry(.105,1),mat(0xb28a
 
 flower.add(flowerCore);
 
-// Çiçeğin arkasındaki sol duvara oyun kontrolleri panosu.
+// Çiçeğin arkasındaki sol duvara el yazısı görünümlü oyun kontrolleri panosu.
 const controlsBoard=group(scene,-3.91,2.12,1.55);
 controlsBoard.rotation.y=Math.PI/2;
 const controlsCanvas=document.createElement('canvas');
 controlsCanvas.width=1024;
-controlsCanvas.height=600;
+controlsCanvas.height=760;
 const controlsCtx=controlsCanvas.getContext('2d');
 controlsCtx.fillStyle='#171713';
-controlsCtx.fillRect(0,0,1024,600);
+controlsCtx.fillRect(0,0,1024,760);
 controlsCtx.strokeStyle='#9b896d';
 controlsCtx.lineWidth=12;
-controlsCtx.strokeRect(18,18,988,564);
+controlsCtx.strokeRect(18,18,988,724);
 controlsCtx.strokeStyle='rgba(190,170,132,.35)';
 controlsCtx.lineWidth=3;
-controlsCtx.strokeRect(34,34,956,532);
+controlsCtx.strokeRect(34,34,956,692);
 controlsCtx.textAlign='center';
 controlsCtx.fillStyle='#d8c7a7';
-controlsCtx.font='bold 68px monospace';
-controlsCtx.fillText('OYUN KONTROLLERI',512,135);
-controlsCtx.fillStyle='#9b896d';
-controlsCtx.fillRect(110,174,804,3);
-controlsCtx.textAlign='left';
-controlsCtx.font='bold 54px monospace';
-controlsCtx.fillStyle='#e8e0d0';
-controlsCtx.fillText('W A S D',145,280);
-controlsCtx.fillStyle='#b9aa8d';
-controlsCtx.font='42px monospace';
-controlsCtx.fillText('YURU',560,280);
-controlsCtx.fillStyle='#e8e0d0';
-controlsCtx.font='bold 54px monospace';
-controlsCtx.fillText('SHIFT',145,380);
-controlsCtx.fillStyle='#b9aa8d';
-controlsCtx.font='42px monospace';
-controlsCtx.fillText('KOS',560,380);
-controlsCtx.fillStyle='#e8e0d0';
-controlsCtx.font='bold 54px monospace';
-controlsCtx.fillText('C',145,480);
-controlsCtx.fillStyle='#b9aa8d';
-controlsCtx.font='42px monospace';
-controlsCtx.fillText('EGIL',560,480);
+controlsCtx.font='italic 76px "Segoe Print", "Comic Sans MS", cursive';
+controlsCtx.save();
+controlsCtx.translate(512,132);
+controlsCtx.rotate(-.025);
+controlsCtx.fillText('Kontroller',0,0);
+controlsCtx.restore();
+controlsCtx.strokeStyle='#9b896d';
+controlsCtx.lineWidth=4;
+controlsCtx.beginPath();
+controlsCtx.moveTo(135,174);
+controlsCtx.quadraticCurveTo(500,188,889,169);
+controlsCtx.stroke();
+const controlRows=[
+  ['W A S D','Yürü'],
+  ['SHIFT','Koş'],
+  ['C','Eğil'],
+  ['Q','Zoom']
+];
+controlRows.forEach((row,i)=>{
+  const y=285+i*112;
+  controlsCtx.save();
+  controlsCtx.translate(340,y);
+  controlsCtx.rotate((i%2===0?-.012:.014));
+  controlsCtx.textAlign='center';
+  controlsCtx.fillStyle='#e8e0d0';
+  controlsCtx.font='italic 60px "Segoe Print", "Comic Sans MS", cursive';
+  controlsCtx.fillText(row[0],0,0);
+  controlsCtx.restore();
+  controlsCtx.save();
+  controlsCtx.translate(710,y);
+  controlsCtx.rotate((i%2===0?.012:-.01));
+  controlsCtx.textAlign='center';
+  controlsCtx.fillStyle='#b9aa8d';
+  controlsCtx.font='italic 52px "Segoe Print", "Comic Sans MS", cursive';
+  controlsCtx.fillText(row[1],0,0);
+  controlsCtx.restore();
+});
 const controlsTexture=new THREE.CanvasTexture(controlsCanvas);
 controlsTexture.colorSpace=THREE.SRGBColorSpace;
 const controlsPanel=new THREE.Mesh(
-  new THREE.PlaneGeometry(1.72,1.02),
+  new THREE.PlaneGeometry(1.72,1.28),
   new THREE.MeshBasicMaterial({map:controlsTexture})
 );
 controlsPanel.position.z=.012;
