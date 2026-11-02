@@ -2251,16 +2251,16 @@ function addWanderingSilhouette(parent,x,z,rnd,chunkKey){
   forestSilhouettes.push({mesh:figure,x,z,originX:x,originZ:z,targetX:x+Math.cos(angle)*distance,targetZ:z+Math.sin(angle)*distance,speed:.45+rnd()*.35,wait:rnd()*2,chunkKey,approachCooldown:10+rnd()*15,approachTime:0,fade:1});
 }
 const stalkerTaunts=[
-  ['Değersizsin!','Değerimi senin sözlerin belirlemiyor.'],
-  ['Kimse seni istemiyor!','Herkesin beni istemesi gerekmiyor. Ben kendi seçimlerimle varım.'],
-  ['Zavallı!','Korkmuş olabilirim ama bu beni zavallı yapmaz.'],
-  ['Zayıfsın!','Güçlü olmak hiç korkmamak değil. Korkuya rağmen ilerleyebilirim.'],
-  ['Kimse doğruyu söylemiyor!','O zaman duyduklarımı sorgularım. Her sözü gerçek kabul etmem.'],
-  ['Gerçeklerden kaçamazsın!','Kaçmıyorum. Ne olduğunu anlamaya çalışıyorum.'],
-  ['Gerçeği kabullen!','Kanıt olmadan senin anlattığını gerçek saymam.'],
-  ['Her zaman içindeyiz!','Beni tanımladığını iddia ediyorsun. Ama kim olduğunu bile bilmiyorum.'],
-  ['Sevmek mi? Ciddi misin?!','Sevmek zayıflık değil. Bir duygu, benim kararım.'],
-  ['Kaçamazsın!','Belki hemen çıkamam. Yine de bir yol bulabilirim.']
+  'Bizden kaçamazsın!',
+  'Gerçeklerden kaçma!',
+  'Sen onlar gibi misin!?',
+  'Yeni bir denek!',
+  'Aradığın şey artık yok!',
+  'Korktuğunu hissediyoruz!',
+  'O artık burada değil!',
+  'Gülünçsün!',
+  'Yakında kim olduğunu hatırlamayacaksın!',
+  'O artık yok!'
 ];
 let stalkerTauntBag=[];
 function nextStalkerTaunt(){
@@ -2270,14 +2270,28 @@ function nextStalkerTaunt(){
 function startStalkerDialogue(){
   if(stalkerDialogueActive)return;
   stalkerDialogueActive=true;
-  const pair=nextStalkerTaunt();
-  if(!pair){stalkerDialogueActive=false;return;}
-  showSubtitle(pair[0]);
-  // Silüetin sözü bittikten sonra kısa bir sessizlik bırak, oyuncu cevabı daha geç versin.
-  const responseDelay=Math.max(4300,pair[0].length*78+1900);
-  const t1=setTimeout(()=>showSubtitle(pair[1]),responseDelay);
-  const t2=setTimeout(()=>{stalkerDialogueActive=false;},responseDelay+Math.max(4200,pair[1].length*55+1800));
-  stalkerDialogueTimers.push(t1,t2);
+  const line=nextStalkerTaunt();
+  if(!line){stalkerDialogueActive=false;return;}
+  // Ormandaki silüetler konuşur; karakter cevap vermez.
+  showSubtitle(line);
+  const duration=Math.max(4200,line.length*70+1800);
+  const timer=setTimeout(()=>{stalkerDialogueActive=false;},duration);
+  stalkerDialogueTimers.push(timer);
+}
+const forestJumpscareReactions=[
+  'Dostum bunlar rüya..',
+  'Siz neden bu kadar gerçekçisiniz!',
+  'Kedi falan düşün!!',
+  'Başarmalıyım..',
+  'Onları dinleme!',
+  'Aradığım şey hakkında... yakında öğreneceğiz.',
+  'Beni korkutmak için bundan fazlası gerekiyor!!!',
+  'S*ktir, yatmadan lavaboya gitmeliydim!!'
+];
+let forestReactionBag=[];
+function nextForestJumpscareReaction(){
+  if(!forestReactionBag.length){forestReactionBag=forestJumpscareReactions.map((_,i)=>i);for(let i=forestReactionBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[forestReactionBag[i],forestReactionBag[j]]=[forestReactionBag[j],forestReactionBag[i]];}}
+  return forestReactionBag.length?forestJumpscareReactions[forestReactionBag.pop()]:null;
 }
 
 function updateForestSilhouettes(dt){
@@ -2422,7 +2436,12 @@ function updateStalkerEffects(dt){
       stalkerScareMesh.scale.setScalar(1.35+eased*1.9);
       stalkerScareMesh.rotation.y=Math.atan2(player.x-stalkerScareMesh.position.x,player.z-stalkerScareMesh.position.z);
     }
-    if(stalkerScareTime>.58){stalkerScareActive=false;stalkerLookTarget=null;stalkerScareMesh=null;for(const s of forestSilhouettes){s.mesh.visible=false;s.mesh.scale.setScalar(.9);}}
+    if(stalkerScareTime>.58){
+      stalkerScareActive=false;stalkerLookTarget=null;stalkerScareMesh=null;
+      for(const s of forestSilhouettes){s.mesh.visible=false;s.mesh.scale.setScalar(.9);}
+      const reaction=nextForestJumpscareReaction();
+      if(reaction)setTimeout(()=>{if(forestActive&&!sleeping&&!waking)showSubtitle(reaction);},450);
+    }
   }
   thoughtCooldown-=dt;
   // İlk silüet görülene kadar mekânı ve buraya geliş nedenini sorgular.
@@ -2543,7 +2562,7 @@ function enterForest(){
   flashlightBtn.classList.remove('on');
   flashlightBtn.setAttribute('aria-label','El fenerini aç');
   flashlightBtn.title='Feneri aç';
-  showSubtitle('Ormanın ortasındasın... Buraya nasıl geldin?');
+  showSubtitle('Dostum ilk rüyadan kabus mu geldi..');
 }
 // ELDE TUTULAN FENER: ışık kaynağı ve görünen model kameraya bağlıdır.
 const flashlightRig=new THREE.Group();
