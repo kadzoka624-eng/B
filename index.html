@@ -70,7 +70,7 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 #dialogueWrap{position:fixed;z-index:8;left:50%;bottom:12%;transform:translateX(-50%);width:max-content;max-width:min(88vw,680px);display:flex;flex-direction:column;align-items:stretch;pointer-events:none}
 #subtitle{position:relative;width:100%;box-sizing:border-box;min-height:0;padding:11px 19px;background:linear-gradient(135deg,rgba(8,12,16,.94),rgba(20,25,30,.91));border:1px solid #a9b6c044;border-left:3px solid #aeb8c4;color:#f3f1eb;font-size:14px;line-height:1.65;letter-spacing:.55px;text-align:center;text-shadow:1px 2px 3px #000;box-shadow:0 8px 28px #0008, inset 0 0 18px #ffffff08;backdrop-filter:blur(7px);border-radius:5px;opacity:0;transition:opacity .25s}
 #subtitle.visible{opacity:1}
-#speakerName{position:relative;align-self:flex-start;margin:0 0 6px 3px;padding:0 4px;color:#d8c7b3;font-size:11px;letter-spacing:2px;text-align:left;text-shadow:1px 2px 4px #000;display:none;pointer-events:none}
+#speakerName{position:relative;align-self:flex-start;margin:0 0 6px 3px;padding:0 4px;color:#d8c7b3;font-size:11px;letter-spacing:2px;text-align:left;text-shadow:1px 2px 4px #000;display:none;pointer-events:none}#speakerName.speaker-red{color:#e03333;text-shadow:0 0 8px #a0101088,1px 2px 4px #000}#speakerName.speaker-guide{color:#d4c4a0;letter-spacing:2.2px}
 #speakerName.visible{display:block}
 #tearOverlay{position:fixed;inset:0;z-index:6;pointer-events:none;opacity:0;overflow:hidden;transition:opacity 1s}
 #tearOverlay.active{opacity:1}
@@ -3030,306 +3030,253 @@ function luciPlaceAtDistance(distance,side=1){
   ghost.position.set(luciTarget.x,1.42,luciTarget.z);ghost.lookAt(player.x,1.4,player.z);
   ghost.visible=false;
 }
-// Canavar-oyuncu atışmaları. who: 'luci' | 'player'. revealName: ismini açıklar (yalnızca bir kez).
-// Bitince tekrar etmez.
+// Luci-oyuncu olay örgüsü: sırayla ilerler, tekrar etmez. 40 diyalog sahnesi.
 const luciExchanges=[
+  // 1 — isim
   [
-    {who:'luci',text:'Korkuyor musun, denek?'},
-    {who:'player',text:'Ben denek değilim. Sen de kimsin?'},
-    {who:'luci',text:'Öncekiler de aynı şeyi söylemişti. Hepiniz aynıydınız.'}
+    {who:'luci',text:'Adım Luci. Unutma... buradan sonra her şey değişir.',revealName:true},
+    {who:'player',text:'Luci mi? Ne istiyorsun?'},
+    {who:'luci',text:'İstemiyorum. Sadece izliyorum. İzlemek yeter.'}
   ],
-  [
-    {who:'player',text:'Orada birisi mi var? Konuş!'},
-    {who:'luci',text:'Konuşuyorum. Sen duymuyorsun sadece.'},
-    {who:'player',text:'Ne aradığımı biliyorsan söyle.'},
-    {who:'luci',text:'Aradığın şeyi bulamayacaksın. Safça umut ediyorsun.'}
-  ],
-  [
-    {who:'luci',text:'Sana acıyorum. Seni denek olarak seçmişler.'},
-    {who:'player',text:'Kim seçmiş? Adını söyle!'},
-    {who:'luci',text:'Adım Luci. Unutma... uzun süre hatırlayacaksın.',revealName:true},
-    {who:'player',text:'Luci mi? Ne istiyorsun benden?'},
-    {who:'luci',text:'İstemiyorum. Sadece izliyorum. Öncekiler gibi çökmeni.'}
-  ],
-  [
-    {who:'luci',text:'Sana yazık oldu... gerçekten.'},
-    {who:'player',text:'Acımanı istemiyorum. Defol!'},
-    {who:'luci',text:'Önceki denek de bağırıyordu. Sonra sustu.'}
-  ],
-  [
-    {who:'player',text:'Aradığım şeyi biliyorsun, değil mi?'},
-    {who:'luci',text:'Biliyorum. Ama sen bulamayacaksın.'},
-    {who:'luci',text:'Rüya diye tutunduğun şey, senin kafesin.'}
-  ],
-  [
-    {who:'luci',text:'Seni izliyorum... her adımını.'},
-    {who:'player',text:'O zaman çık karşıma!'},
-    {who:'luci',text:'Görünmek zorunda değilim. Işıkların titremesi yeter.'}
-  ],
-  [
-    {who:'player',text:'Önceki deneklere ne yaptınız?'},
-    {who:'luci',text:'Biz mi? Hayır... onlar kendi kendilerini bitirdi.'},
-    {who:'luci',text:'Unutursan bana kalırsın. Unutma, denek.'}
-  ],
-  [
-    {who:'luci',text:'Safsın. Gerçekten safsın.'},
-    {who:'player',text:'Seninle dalga geçme.'},
-    {who:'luci',text:'Seni buraya atanlar dalga geçti, ben değil.'}
-  ],
-  [
-    {who:'player',text:'Neden ışıklar gidip geliyor?'},
-    {who:'luci',text:'Çünkü yakınımdayım. Hâlâ anlamadın mı?'},
-    {who:'luci',text:'Kemikleri hâlâ koridorlarda. Onlar da cesurdu.'}
-  ],
-  [
-    {who:'luci',text:'Kimse seni kurtarmaya gelmeyecek.'},
-    {who:'player',text:'Kimsenin gelmesine gerek yok. Kendim çıkarım.'},
-    {who:'luci',text:'Cesur konuşuyorsun. Tıpkı diğer denekler gibi.'}
-  ],
-  [
-    {who:'luci',text:'Denek 17 üç gün dayandı. Sen daha bir saati doldurmadın.'},
-    {who:'player',text:'Numara falan değilim!'},
-    {who:'luci',text:'Hepiniz numarasınız. Duvarlara kazıdığınız isimler silindi.'}
-  ],
-  [
-    {who:'player',text:'Bu yer nedir? Neden buradayım?'},
-    {who:'luci',text:'Bilinçaltının çöplüğü. Atıldığın yer burası.'},
-    {who:'luci',text:'Denekler burada "uyandık" sanır. Uyanmazlar.'}
-  ],
-  [
-    {who:'luci',text:'Enerji içeceği mi arıyorsun? Zavallı.'},
-    {who:'player',text:'Sus. Uyanık kalmam lazım.'},
-    {who:'luci',text:'Önceki denek de öyle demişti. Kutu boşken ağladı.'}
-  ],
-  [
-    {who:'player',text:'Seni görmeden nasıl konuşuyorsun?'},
-    {who:'luci',text:'Görmen gerekmiyor. Korkman yeterli.'},
-    {who:'luci',text:'Gördüklerinde çoğu dilini yutmuştu zaten.'}
-  ],
-  [
-    {who:'luci',text:'Denek 4 kendi gölgesinden kaçmaya çalışmıştı.'},
-    {who:'player',text:'Ne saçmalıyorsun?'},
-    {who:'luci',text:'Sonra gölge onu yakaladı. Senin gibi koşuyordu.'}
-  ],
-  [
-    {who:'player',text:'Çıkış nerede?'},
-    {who:'luci',text:'Çıkış diye bir yalan var. Ona inananlar daha çabuk biter.'},
-    {who:'luci',text:'Sen de inanıyorsun. Bu yüzden komiksin.'}
-  ],
-  [
-    {who:'luci',text:'Ellerin titriyor. Duymuyor musun nefesini?'},
-    {who:'player',text:'Titremiyorum.'},
-    {who:'luci',text:'Yalanın bile zayıf. Denek 9 daha inandırıcıydı.'}
-  ],
-  [
-    {who:'player',text:'Beni neden seçtiler?'},
-    {who:'luci',text:'Çünkü kırılgansın. Çünkü unutmaya yatkınsın.'},
-    {who:'luci',text:'İyi denekler sessizce erir. Sen de eriyorsun.'}
-  ],
-  [
-    {who:'luci',text:'Duvarlardaki yazıları okudun mu?'},
-    {who:'player',text:'Okudum. Yardım isteyenler...'},
-    {who:'luci',text:'Hepsi denekti. Hiçbiri bitiremedi cümlesini.'}
-  ],
-  [
-    {who:'player',text:'Sen de bir deney misin?'},
-    {who:'luci',text:'Ben sonuçuyum. Siz ise hâlâ malzemesiniz.'},
-    {who:'luci',text:'Malzeme bitince ortalık sessizleşir. Bekliyorum.'}
-  ],
-  [
-    {who:'luci',text:'Koşma. Ayak sesin beni güldürüyor.'},
-    {who:'player',text:'Gülme o zaman. Yok ol!'},
-    {who:'luci',text:'Yok olmuyorum. Siz yok oluyorsunuz, teker teker.'}
-  ],
-  [
-    {who:'player',text:'Önceki deneklerden biri kurtuldu mu?'},
-    {who:'luci',text:'Kurtuldu sanan oldu. Sonra geri düştü.'},
-    {who:'luci',text:'Buraya düşen tekrar uyanmaz. Sen de uyanmayacaksın.'}
-  ],
-  [
-    {who:'luci',text:'Adını unutmaya başladın mı? Daha erken.'},
-    {who:'player',text:'Adımı biliyorum!'},
-    {who:'luci',text:'Şimdilik. Denek 22 son gününde kendi adını soruyordu.'}
-  ],
+  // 2
   [
     {who:'player',text:'Neden benimle konuşuyorsun?'},
-    {who:'luci',text:'Canım sıkılıyor. Yeni oyuncak gelmiş.'},
-    {who:'luci',text:'Eski oyuncaklar kırıldı. Senin sıran.'}
+    {who:'luci',text:'Çünkü yeni denekler hep soru sorar. Eğlenceli oluyor.'},
+    {who:'luci',text:'Sen de sor. Ben de güleyim.'}
   ],
+  // 3
   [
-    {who:'luci',text:'Fenerini açıp kapa. Belki cesaret gelir.'},
-    {who:'player',text:'Alay etme.'},
-    {who:'luci',text:'Alay etmiyorum. Eğleniyorum. Farkı öğren.'}
+    {who:'luci',text:'Aradığın şeyi biliyorum.'},
+    {who:'player',text:'O zaman söyle!'},
+    {who:'luci',text:'Söylesem aramak biter. Aramak senin tek bağın.'}
   ],
+  // 4
   [
-    {who:'player',text:'Bilinçaltımda mıyım gerçekten?'},
-    {who:'luci',text:'Evet. Ve burada en zayıf düşüncen bile büyür.'},
-    {who:'luci',text:'Senin zayıf düşüncen "kurtulurum". Ne tatlı.'}
+    {who:'player',text:'Ne aradığımı bile bilmiyorum...'},
+    {who:'luci',text:'İşte bu yüzden seçildin. Boşluk, iyi bir denek malzemesi.'},
+    {who:'luci',text:'İpucu vereyim: aradığın şey burada değil. Ama buradan geçiyor.'}
   ],
+  // 5
   [
-    {who:'luci',text:'Denek 11 enerji içeceğini yere döküp ağlamıştı.'},
-    {who:'player',text:'Ben dökmem.'},
-    {who:'luci',text:'Dökmesen de uykun gelir. Hepinizin uykusu gelir.'}
+    {who:'luci',text:'Bir zamanlar ben de koridorlarda yürüdüm. Tıpkı senin gibi.'},
+    {who:'player',text:'Sen de mi denekin?'},
+    {who:'luci',text:'Denektim. Sonra denek bitti, ben kaldım.'}
   ],
+  // 6
   [
-    {who:'player',text:'Sesi kapatamaz mısın?'},
-    {who:'luci',text:'Kapatırsan kendi sesin kalır. O daha kötü.'},
-    {who:'luci',text:'Kendi sesinden kaçan denekler duvara kafa atardı.'}
+    {who:'player',text:'Nasıl kaldın? Ne oldu sana?'},
+    {who:'luci',text:'Unuttum kim olduğumu. Unutunca yer açıldı. Ben o boşluğa oturdum.'},
+    {who:'luci',text:'Sen de unutursan yerin hazır.'}
   ],
+  // 7
   [
-    {who:'luci',text:'Sırtında bir bakış hissediyorsun, değil mi?'},
-    {who:'player',text:'Hissetmiyorum.'},
-    {who:'luci',text:'Yalan. Omuzun kasıldı. Gördüm.'}
+    {who:'luci',text:'Deneylerin amacı basit: sınır.'},
+    {who:'player',text:'Hangi sınır?'},
+    {who:'luci',text:'Bilinç ile çöküş arasındaki ince çizgi. Siz o çizgide savruluyorsunuz.'}
   ],
+  // 8
   [
-    {who:'player',text:'Ne kadar süredir buradasın?'},
-    {who:'luci',text:'Sizin zamanınızla ölçülmem. Denekler ölçülür.'},
-    {who:'luci',text:'Senin süren de dolmak üzere. Acele et, komik ol.'}
+    {who:'player',text:'Kim yapıyor bu deneyleri?'},
+    {who:'luci',text:'İsimleri yok. Laboratuvar da yok. Sadece seçim var.'},
+    {who:'luci',text:'Sen seçildin. Ben sonuç oldum. Fark bu.'}
   ],
+  // 9
   [
-    {who:'luci',text:'Kahraman mı oynamak istiyorsun?'},
-    {who:'player',text:'Sadece çıkmak istiyorum.'},
-    {who:'luci',text:'Çıkış yok, sahne var. Alkış yok, sadece ben varım.'}
+    {who:'luci',text:'Denek 4 üç gece dayandı. Dördüncüde kendi adını sordu.'},
+    {who:'player',text:'Sonra?'},
+    {who:'luci',text:'Cevap gelmedi. Duvarlara yazı yazmayı bıraktı. Sessizlik kaldı.'}
   ],
+  // 10
   [
-    {who:'player',text:'Diğer denekler ne arıyordu?'},
-    {who:'luci',text:'Aynı şeyi: anlam, çıkış, ev. Hiçbiri yok burada.'},
-    {who:'luci',text:'Sen de aynı listedesin. Sıra numaranı bekle.'}
+    {who:'player',text:'Önceki denekler neden burada?'},
+    {who:'luci',text:'Aynı sebeple: bir şey arıyorlardı. Bulamadılar.'},
+    {who:'luci',text:'Bulamayınca birbirlerine döndüler. Sonra bana.'}
   ],
+  // 11
   [
-    {who:'luci',text:'Ayakkabılarının sesi tanıdık. Bir başkası da böyle yürürdü.'},
-    {who:'player',text:'Ben o değilim.'},
-    {who:'luci',text:'Henüz değilsin. Biraz daha yürü, olursun.'}
+    {who:'luci',text:'Aradığın şey... bir kapı gibi hissediliyor, değil mi?'},
+    {who:'player',text:'Belki.'},
+    {who:'luci',text:'Kapı değil. Ama kapı sanıyorsun. Bu da ipucu.'}
   ],
+  // 12
   [
-    {who:'player',text:'Beni korkutarak ne kazanıyorsun?'},
-    {who:'luci',text:'Korkun besler burayı. Ben de buranın parçasıyım.'},
-    {who:'luci',text:'Ne kadar korkarsan o kadar uzun kalırsın. Teşekkürler.'}
+    {who:'player',text:'Sen benim bilinç altımın bir parçasısın.'},
+    {who:'luci',text:'Ha! Ne tatlı. Her denek aynı teoriyi kurar.'},
+    {who:'luci',text:'Bilinçaltın olsaydım nazik olurdum. Ben değilim.'}
   ],
+  // 13
   [
-    {who:'luci',text:'Denek 8 "bu sadece rüya" diye bağırıp güldü.'},
-    {who:'player',text:'Belki de rüya.'},
-    {who:'luci',text:'O da öyle demişti. Gülmesi yarım kaldı.'}
+    {who:'luci',text:'Bilinçaltın parçası mı? Ben senin korkunun kiracısıyım.'},
+    {who:'player',text:'Dalga geçme.'},
+    {who:'luci',text:'Dalga geçmiyorum. Eğleniyorum. Farkı öğren.'}
   ],
+  // 14
   [
-    {who:'player',text:'Sus artık.'},
-    {who:'luci',text:'Susarsam sen kendi kafanla konuşursun. Daha kötü.'},
-    {who:'luci',text:'İstersen susayım. Yalnızlığın tadına bak.'}
+    {who:'player',text:'Neden ışıklar titriyor?'},
+    {who:'luci',text:'Yaklaşınca titrer. Uzaklaşınca susar. Basit fizik... benim fizik.'},
+    {who:'luci',text:'Titreme bir selamdır. Alış.'}
   ],
+  // 15
   [
-    {who:'luci',text:'El fenerin zayıf. Cesaretin de öyle.'},
-    {who:'player',text:'Yeter!'},
-    {who:'luci',text:'Yeter diyen denekler en hızlı tükenenlerdi.'}
+    {who:'luci',text:'Bir denek bana isim takmıştı. "Gölge" demişti.'},
+    {who:'player',text:'Sen Luci\'sin.'},
+    {who:'luci',text:'O ismi o gece unuttum. O da unutuldu. Sen unutma... şimdilik.'}
   ],
+  // 16
   [
-    {who:'player',text:'Buradan çıkacağım, sonra seni unutacağım.'},
-    {who:'luci',text:'Unutmak buranın kuralı. Unutursan bana kalırsın.'},
-    {who:'luci',text:'Hatırla: unutmak ölümün kibar adıdır.'}
+    {who:'player',text:'Çıkış nerede?'},
+    {who:'luci',text:'Çıkış arayanlar hep aynı köşeye döner.'},
+    {who:'luci',text:'Aradığın şey çıkış değil. Çıkış sandığın şey seni burada tutuyor.'}
   ],
+  // 17
   [
-    {who:'luci',text:'Kan lekelerini gördün mi? Temizlik yok burada.'},
-    {who:'player',text:'Kimindi onlar?'},
-    {who:'luci',text:'Deneklerin. İsimleri silindi, lekeleri kaldı.'}
+    {who:'luci',text:'Deney bitti sanıyorsunuz ya... asıl deney unutma.'},
+    {who:'player',text:'Ne demek unutma?'},
+    {who:'luci',text:'Kim olduğunu unutursan ölçüm tamamlanır. Ben o ölçümün artığıyım.'}
   ],
+  // 18
   [
-    {who:'player',text:'Sen hiç insan oldun mu?'},
-    {who:'luci',text:'Soru yanlış. Siz hiç denek olmadınız mı?'},
-    {who:'luci',text:'Cevap evet. Hepiniz oldunuz. Sen de.'}
+    {who:'player',text:'Sana ne oldu tam olarak?'},
+    {who:'luci',text:'Koridorun sonunda bir ses duydum. Dönüp baktım. Yüzüm yoktu.'},
+    {who:'luci',text:'O günden beri başkalarının yüzüne bakıyorum. Senin de.'}
   ],
+  // 19
   [
-    {who:'luci',text:'Yavaşla. Nefesin düzensiz.'},
-    {who:'player',text:'Sana ne?'},
-    {who:'luci',text:'Bana bir şey olmaz. Sana olur. Bu eğlenceli.'}
+    {who:'luci',text:'Denek 11 enerji kutularını topladı, içti, güldü.'},
+    {who:'player',text:'Sonra?'},
+    {who:'luci',text:'Gülmesi yarım kaldı. Kutular kaldı. Sen de topluyorsun... ne tatlı.'}
   ],
+  // 20
   [
-    {who:'player',text:'Bir daha asla buraya gelmem.'},
-    {who:'luci',text:'Gelmemek için önce çıkman lazım.'},
-    {who:'luci',text:'Çıkamayanlar hep aynı cümleyi kurardı.'}
+    {who:'player',text:'Beni neden seçtiler?'},
+    {who:'luci',text:'Çünkü zayıf bir umudun var. Umut, iyi bir kanca.'},
+    {who:'luci',text:'Aradığın şeye tutunuyorsun. O tutuş seni burada sabitliyor.'}
   ],
+  // 21
   [
-    {who:'luci',text:'Denek 3 saatlerce aynı koridorda döndü.'},
-    {who:'player',text:'Ben dönmem.'},
-    {who:'luci',text:'Döndüğünü anlamadan dönersin. Bak, yine aynı duvar.'}
+    {who:'luci',text:'İpucu daha: aradığın şey bir yer değil, bir an.'},
+    {who:'player',text:'Hangi an?'},
+    {who:'luci',text:'Söylesem an gider. Gitmesin istiyorsan sus.'}
   ],
+  // 22
   [
-    {who:'player',text:'Neden benimle dalga geçiyorsun?'},
-    {who:'luci',text:'Çünkü hâlâ umut ediyorsun. Umut gülünçtür burada.'},
-    {who:'luci',text:'Umut bitince sessizlik gelir. Sessizliği seviyorum.'}
+    {who:'player',text:'Önceki deneklerden biri kurtuldu mu?'},
+    {who:'luci',text:'Kurtuldu sanan oldu. Sabah diye bağırdı.'},
+    {who:'luci',text:'Sabah gelmedi. Ben geldim.'}
   ],
+  // 23
   [
-    {who:'luci',text:'Kutuyu açtın, içtin, rahatladın. Ne kadar ucuz.'},
-    {who:'player',text:'Hayatta kalmaya çalışıyorum.'},
-    {who:'luci',text:'Hayatta kalmak da bir denek refleksi. Tebrikler.'}
+    {who:'luci',text:'Ben bir gece aynada kendimi aradım. Ayna boştu.'},
+    {who:'player',text:'Ne gördün?'},
+    {who:'luci',text:'Seni. Daha gelmemiştin ama yerin hazırdı.'}
   ],
-  [
-    {who:'player',text:'Bu konuşmalar neye yarıyor?'},
-    {who:'luci',text:'Seni yormaya. Yorgun denek daha lezzetli unutur.'},
-    {who:'luci',text:'Yorul, unut, kaybol. Basit tarif.'}
-  ],
-  [
-    {who:'luci',text:'Arkana bakma dediler ya... bakmayan da kurtulamadı.'},
-    {who:'player',text:'O zaman ne yapayım?'},
-    {who:'luci',text:'Hiçbir şey. Zaten geç kaldın.'}
-  ],
-  [
-    {who:'player',text:'Bitti mi bu oyun?'},
-    {who:'luci',text:'Oyun sizin kelimeniz. Ben sadece bekliyorum.'},
-    {who:'luci',text:'Bitti sandığında yeniden başlar. Alış.'}
-  ],
-  [
-    {who:'luci',text:'Denek 19 son sözü "anlıyorum" olmuştu.'},
-    {who:'player',text:'Ne anladı?'},
-    {who:'luci',text:'Anlamadığını. Çok geç fark etti. Sen de edeceksin.'}
-  ],
-  [
-    {who:'player',text:'Bir gün burayı yakacağım.'},
-    {who:'luci',text:'Ateş de denendi. Duman dağıldı, koridor kaldı.'},
-    {who:'luci',text:'Sen de dağılırsın. Koridor kalır.'}
-  ],
-  [
-    {who:'luci',text:'Gülüyorum ama sesimi duymuyorsun. İyi ki.'},
-    {who:'player',text:'Ne gülünecek bir şey var?'},
-    {who:'luci',text:'Sen varsın. Yeter de artar.'}
-  ],
-  [
-    {who:'player',text:'Son denek kimdi?'},
-    {who:'luci',text:'Soru yanlış. Son denek sensin. Şimdilik.'},
-    {who:'luci',text:'Bir sonraki gelince sen de "önceki" olursun.'}
-  ],
-  [
-    {who:'luci',text:'Adımların ağırlaştı. Uyku mu, korku mu?'},
-    {who:'player',text:'İkisi de değil.'},
-    {who:'luci',text:'İkisi birden. Kabul et, daha az acıtır... yok aslında acıtır.'}
-  ],
-  [
-    {who:'player',text:'Beni takip etmeyi bırak.'},
-    {who:'luci',text:'Takip etmiyorum. Zaten her yerdeyim.'},
-    {who:'luci',text:'Sen hareket ediyorsun sanıyorsun. Sahne seni seçiyor.'}
-  ],
-  [
-    {who:'luci',text:'Bir denek bana isim takmıştı. Unuttum. O da unutuldu.'},
-    {who:'player',text:'Ben unutturmam kendimi.'},
-    {who:'luci',text:'Herkes öyle der. Sonra duvarlara yazıp kaybolur.'}
-  ],
+  // 24
   [
     {who:'player',text:'Bu labirent sonsuz mu?'},
     {who:'luci',text:'Sonsuz değil. Sen bitene kadar uzun.'},
-    {who:'luci',text:'Bitince kısa gelir. Geçmiş gibi.'}
+    {who:'luci',text:'Bitince kısa gelir. Geçmiş gibi. Herkese öyle olur.'}
   ],
+  // 25
   [
-    {who:'luci',text:'Şşşt... bir an sessiz kal. Kendi kalp atışını dinle.'},
-    {who:'player',text:'...'},
-    {who:'luci',text:'Güzel. Korkunun ritmi bu. Alışıyorsun.'}
+    {who:'luci',text:'Denek 19 son sözü "anlıyorum" olmuştu.'},
+    {who:'player',text:'Ne anladı?'},
+    {who:'luci',text:'Anlamadığını. Çok geç. Sen de edeceksin o cümleyi.'}
   ],
+  // 26
   [
-    {who:'player',text:'Bir daha konuşma.'},
-    {who:'luci',text:'Konuşmasam da buradayım. Konuşmam lütuf.'},
-    {who:'luci',text:'İstersen susayım. Karanlık daha samimi olur.'}
+    {who:'player',text:'Sen gerçekten bilinçaltım değilsin o zaman.'},
+    {who:'luci',text:'Değilim. Ama senin bilinçaltın beni davet etti.'},
+    {who:'luci',text:'Kapıyı sen açtın. Ben sadece içeri süzüldüm.'}
+  ],
+  // 27
+  [
+    {who:'luci',text:'Aradığın şey... bir isim gibi duruyor bazen.'},
+    {who:'player',text:'Kimin ismi?'},
+    {who:'luci',text:'Söylemem. Söylersem arama biter, sen de bitersin.'}
+  ],
+  // 28
+  [
+    {who:'player',text:'Neden benimle dalga geçiyorsun sürekli?'},
+    {who:'luci',text:'Çünkü hâlâ umut ediyorsun. Umut burada gülünçtür.'},
+    {who:'luci',text:'Gülünç olan şeyler beni canlı tutar.'}
+  ],
+  // 29
+  [
+    {who:'luci',text:'Bir denek bana "defol" demişti. Defolmadım.'},
+    {who:'player',text:'Ben de diyorum: defol.'},
+    {who:'luci',text:'Duydum. Hâlâ buradayım. Komik değil mi?'}
+  ],
+  // 30
+  [
+    {who:'player',text:'Bu deneyler kime yarıyor?'},
+    {who:'luci',text:'Sonuca. Sonuç bazen ben oluyorum, bazen sessizlik.'},
+    {who:'luci',text:'Sen hangi sonuç olacaksın, henüz belli değil.'}
+  ],
+  // 31
+  [
+    {who:'luci',text:'Kemikleri gördün. İsimleri yok. İsimler önce gider.'},
+    {who:'player',text:'Ben unutturmam kendimi.'},
+    {who:'luci',text:'Herkes öyle der. Sonra duvara yazar, yazar... kaybolur.'}
+  ],
+  // 32
+  [
+    {who:'player',text:'Aradığım şey hakkında bir şey daha söyle.'},
+    {who:'luci',text:'Yaklaştıkça soğur. Uzaklaştıkça yanar.'},
+    {who:'luci',text:'Bu kadar. Fazlası spoiler... ve spoiler öldürür.'}
+  ],
+  // 33
+  [
+    {who:'luci',text:'Ben uyumadım yıllarca. Uyuyunca kayboldum.'},
+    {who:'player',text:'Uyursam ne olur?'},
+    {who:'luci',text:'Bana kalırsın. Bu cümleyi seviyor um.'}
+  ],
+  // 34
+  [
+    {who:'player',text:'Ruhani rehber çıkış arayacağını söylemişti.'},
+    {who:'luci',text:'Rehber mi? Tatlı. O da bir maske.'},
+    {who:'luci',text:'Maskeler burada çok. Sen de bir tane takıyorsun: "kahraman".'}
+  ],
+  // 35
+  [
+    {who:'luci',text:'Denek 7 "bu sadece rüya" diye bağırdı.'},
+    {who:'player',text:'Belki de rüya.'},
+    {who:'luci',text:'Rüya diye tutunmak da bir denek refleksi. Tebrikler.'}
+  ],
+  // 36
+  [
+    {who:'player',text:'Sen hiç insan oldun mu, Luci?'},
+    {who:'luci',text:'Oldum. Sonra insan kelimesi yetmedi.'},
+    {who:'luci',text:'Şimdi senin adımlarını sayıyorum. Eski hobim.'}
+  ],
+  // 37
+  [
+    {who:'luci',text:'Aradığın şey seni burada tutuyor. Bırakırsan düşersin.'},
+    {who:'player',text:'Bırakmayacağım.'},
+    {who:'luci',text:'Bırakmayanlar en çok kırılanlardı. Bakalım.'}
+  ],
+  // 38
+  [
+    {who:'player',text:'Bu konuşmalar neye yarıyor?'},
+    {who:'luci',text:'Seni yormaya. Yorgun denek daha çabuk unutur.'},
+    {who:'luci',text:'Yorul, unut, kaybol. Tarif bu. Basit ve etkili.'}
+  ],
+  // 39
+  [
+    {who:'luci',text:'Bir gün ismini soracağım. Cevap veremezsen iş bitmiş demektir.'},
+    {who:'player',text:'Adımı biliyorum.'},
+    {who:'luci',text:'Şimdilik. Denek 22 son gününde kendi adını sormuştu bana.'}
+  ],
+  // 40
+  [
+    {who:'player',text:'Bir daha asla buraya gelmem.'},
+    {who:'luci',text:'Gelmemek için önce çıkman lazım.'},
+    {who:'luci',text:'Çıkamayanlar hep aynı cümleyi kurardı. Sen de kurdun. Hoşça kal... şimdilik.'}
   ]
 ];
-let luciExchangeBag=[];
+let luciExchangeBag=[]; // kullanılmıyor (sıralı sistem)
 let luciExchangesExhausted=false;
 let luciNameRevealed=false;
+let luciStoryIndex=0;
 let luciExchangeActive=false;
 let luciExchangeQueue=[];
 let luciExchangeTimer=0;
@@ -3341,40 +3288,31 @@ function showSpokenLine(speaker,message,typingSpeed=26){
   if(speaker){
     speakerName.textContent=speaker;
     speakerName.classList.add('visible');
+    speakerName.classList.remove('speaker-red','speaker-guide');
+    if(speaker==='LUCİ'||speaker==='BEN'||speaker==='BELİRSİZ'){
+      speakerName.classList.add('speaker-red');
+    }else if(speaker==='RUHANİ REHBER'){
+      speakerName.classList.add('speaker-guide');
+    }
   }else{
-    speakerName.classList.remove('visible');
+    speakerName.classList.remove('visible','speaker-red','speaker-guide');
   }
   showSubtitle(message,typingSpeed);
   const duration=Math.max(4200,message.length*typingSpeed+2600);
   clearTimeout(showSpokenLine.hideSpeakerTimer);
   showSpokenLine.hideSpeakerTimer=setTimeout(()=>{
-    // Altyazı kapanınca isim de kaybolur (açılış diyaloğu kendi yönetir).
     if(!petIntroStarted||!movementLocked)speakerName.classList.remove('visible');
   },duration);
   return duration/1000;
 }
 function startLuciExchange(){
   if(luciExchangeActive||stalkerDialogueActive)return;
-  // Torba boşsa bir kez doldur; bir daha doldurma (tekrar yok).
-  if(!luciExchangeBag.length){
-    if(luciExchangesExhausted)return;
-    luciExchangeBag=luciExchanges.map((_,i)=>i);
-    for(let i=luciExchangeBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[luciExchangeBag[i],luciExchangeBag[j]]=[luciExchangeBag[j],luciExchangeBag[i]];}
-  }
-  // İsim bir kez söylenir: isim açıklandıysa revealName içeren diyalogları atla.
-  let idx=-1;
-  while(luciExchangeBag.length){
-    const candidate=luciExchangeBag.pop();
-    const ex=luciExchanges[candidate];
-    if(luciNameRevealed&&ex.some(l=>l.revealName))continue;
-    idx=candidate;break;
-  }
-  if(idx<0){
+  if(luciStoryIndex>=luciExchanges.length){
     luciExchangesExhausted=true;
     return;
   }
-  if(!luciExchangeBag.length)luciExchangesExhausted=true;
-  const exchange=luciExchanges[idx];
+  const exchange=luciExchanges[luciStoryIndex++];
+  if(luciStoryIndex>=luciExchanges.length)luciExchangesExhausted=true;
   luciExchangeQueue=exchange.map(l=>({...l}));
   luciExchangeActive=true;
   luciExchangeTimer=0.15;
@@ -3386,7 +3324,7 @@ function updateLuciExchange(dt){
   if(luciExchangeTimer>0)return;
   if(!luciExchangeQueue.length){
     luciExchangeActive=false;
-    luciTalkCooldown=3.2+Math.random()*2.8;
+    luciTalkCooldown=3.5+Math.random()*2.5;
     return;
   }
   const next=luciExchangeQueue.shift();
@@ -3567,9 +3505,7 @@ function updateBackroomsItems(dt){
     if(sleepBlinkTime>0){sleepBlinkTime-=dt;blink.style.opacity=String(Math.min(.88,(backroomsSleep-68)/36));}
     else{blink.style.opacity='0';if(sleepBlinkCooldown<=0){sleepBlinkTime=.16;sleepBlinkCooldown=Math.max(.65,2.8-(backroomsSleep-76)*.045);}}
   }else{sleepBlinkTime=0;blink.style.opacity='0';}
-  if(backroomsSleep>=28&&!backroomsSleepWarned&&!stalkerDialogueActive&&!subtitle.classList.contains('visible')){backroomsSleepWarned=true;showSubtitle('Uykum gelmeye başladı... Gözlerimi açık tutmalıyım.');}
-  if(backroomsSleep>=68&&!backroomsSleepCritical&&!stalkerDialogueActive&&!subtitle.classList.contains('visible')){backroomsSleepCritical=true;showSubtitle('Gözlerim kapanıyor... Biraz daha dayanmalıyım.');}
-  for(const item of almondWaterItems){
+    for(const item of almondWaterItems){
     if(item.userData.collected)continue;
     item.material.rotation+=dt*.12;
     if(almondWaterCount<10&&Math.hypot(player.x-item.position.x,player.z-item.position.z)<1.05){
@@ -3582,7 +3518,7 @@ function updateBackroomsItems(dt){
 
 function enterBackrooms(){
   forestActive=false;backroomsActive=true;collapseStarted=false;collapseTime=0;movementLocked=false;
-  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;luciRevealTime=0;luciTeleportCooldown=2;luciAttackCooldown=0;luciScareCooldown=0;luciCollapsing=false;luciCollapseTime=0;luciPresenceActive=false;luciPresenceTime=0;luciTalkCooldown=3.5;luciPulseQueue=0;luciPulseTimer=0;luciPulsePhase=0;luciNameRevealed=false;luciExchangesExhausted=false;luciExchangeActive=false;luciExchangeQueue=[];luciExchangeTimer=0;luciExchangeBag=[];if(luciGhost)luciGhost.visible=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
+  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;luciRevealTime=0;luciTeleportCooldown=2;luciAttackCooldown=0;luciScareCooldown=0;luciCollapsing=false;luciCollapseTime=0;luciPresenceActive=false;luciPresenceTime=0;luciTalkCooldown=3.5;luciPulseQueue=0;luciPulseTimer=0;luciPulsePhase=0;luciNameRevealed=false;luciExchangesExhausted=false;luciStoryIndex=0;luciExchangeActive=false;luciExchangeQueue=[];luciExchangeTimer=0;luciExchangeBag=[];if(luciGhost)luciGhost.visible=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
   if(backroomsGuide)backroomsGuide.visible=false;
   startBackroomsAmbience();
   startBackroomsCreaks();
@@ -3613,7 +3549,7 @@ function startBackroomsEncounter(){
   backroomsGuide.position.set(player.x+forward.x*5,0,player.z+forward.z*5);
   backroomsGuide.lookAt(player.x,1.2,player.z);backroomsGuide.visible=true;
   stalkerDialogueActive=true;movementLocked=true;
-  showSubtitle('selam!');
+  showSpokenLine('RUHANİ REHBER','selam!',24);
 }
 function updateBackroomsEncounter(dt){
   if(!backroomsActive)return;
@@ -3633,7 +3569,7 @@ function updateBackroomsEncounter(dt){
     {at:36,text:'şimdilik ben gidiyorum sizin için bir çıkış arayacağım! fazla ses çıkarmayın o sesten hoşlanmaz..'}
   ];
   if(backroomsEncounterStep<lines.length&&backroomsEncounterStepTime>=lines[backroomsEncounterStep].at){
-    const line=lines[backroomsEncounterStep];showSubtitle(line.text);
+    const line=lines[backroomsEncounterStep];showSpokenLine('RUHANİ REHBER',line.text,24);
     backroomsEncounterStep++;
   }
   if(backroomsEncounterWobble>0){
