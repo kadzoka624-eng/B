@@ -43,16 +43,31 @@ canvas{display:block}
 #hint{display:none!important}
 #vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse,transparent 55%,#0007 100%)}
 #blink{position:fixed;inset:0;z-index:7;background:#000;opacity:0;pointer-events:none}
-#start{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#111216;text-align:center;padding:20px}
-#start h1{font-size:clamp(38px,8vw,78px);font-weight:400;letter-spacing:9px;margin:0 0 12px}
-#start p{font-size:11px;letter-spacing:2px;color:#aaa;line-height:2}
-#loadingStatus{min-height:22px;margin:18px 0 8px;color:#c9c9c9;font-size:12px;letter-spacing:2px;text-shadow:0 0 12px #ffffff33}
-#play{display:none;opacity:0;transform:translateY(8px);transition:opacity .6s ease,transform .6s ease}
+#start{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;overflow:hidden;background:#07080a}
+#startBg{position:absolute;inset:0;background:
+  radial-gradient(ellipse 80% 55% at 50% 35%,#1a1814 0%,#0c0d10 55%,#050506 100%);
+  pointer-events:none}
+#startGrain{position:absolute;inset:-20%;opacity:.14;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:grainShift 1.8s steps(2) infinite}
+@keyframes grainShift{0%{transform:translate(0,0)}100%{transform:translate(-3%,2%)}}
+#startVignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 35%,#000c 100%)}
+#startPanel{position:relative;z-index:2;width:min(440px,92vw);padding:36px 28px 28px;background:linear-gradient(165deg,rgba(18,17,15,.92),rgba(8,8,10,.94));border:1px solid #6e655866;box-shadow:0 0 0 1px #0008,0 24px 60px #000c,inset 0 1px 0 #ffffff0a;clip-path:polygon(0 0,100% 0,100% 92%,96% 100%,0 100%)}
+#startBadge{display:inline-block;margin:0 0 18px;padding:5px 12px;font-size:10px;letter-spacing:3px;color:#c4b89a;border:1px solid #8a7f6a55;background:#12110e}
+#start h1{font-size:clamp(42px,9vw,72px);font-weight:400;letter-spacing:clamp(6px,1.5vw,14px);margin:0 0 8px;color:#e8e2d4;text-shadow:0 0 28px #c9b89633,0 2px 0 #000;animation:titlePulse 4.5s ease-in-out infinite}
+@keyframes titlePulse{0%,100%{opacity:.92;text-shadow:0 0 20px #c9b89622,0 2px 0 #000}50%{opacity:1;text-shadow:0 0 36px #c9b89644,0 2px 0 #000}}
+#start .start-sub{font-size:11px;letter-spacing:3px;color:#8a8376;margin:0 0 6px}
+#start .start-tag{font-size:12px;letter-spacing:2px;color:#bdb5a4;line-height:1.9;margin:0 0 22px}
+#startDivider{width:64px;height:1px;margin:0 auto 22px;background:linear-gradient(90deg,transparent,#a3947844,#c4b89a,#a3947844,transparent)}
+#loadingStatus{min-height:20px;margin:0 0 14px;color:#9a9284;font-size:11px;letter-spacing:2.5px}
+#loadingBar{width:min(220px,70%);height:3px;margin:0 auto 20px;background:#1a1916;border:1px solid #5a534855;overflow:hidden}
+#loadingBarFill{height:100%;width:8%;background:linear-gradient(90deg,#6a5f48,#c4b89a,#8a7a58);transition:width .6s ease;box-shadow:0 0 10px #c4b89a55}
+#play{display:none;opacity:0;transform:translateY(10px);transition:opacity .55s ease,transform .55s ease,background .2s,box-shadow .2s;padding:14px 40px;letter-spacing:4px;margin:4px 0 18px;cursor:pointer;font-size:13px;color:#e8e2d4;background:linear-gradient(180deg,#2a2824,#1a1916);border:1px solid #9a8b70;box-shadow:0 4px 18px #0008,inset 0 1px 0 #ffffff12}
 #play.ready{display:inline-block;opacity:1;transform:translateY(0)}
-#studioCredit{margin-top:16px;color:#777;font-size:10px;letter-spacing:3px;transform-style:preserve-3d;animation:studioSpin 7s linear infinite;text-shadow:0 0 9px #ffffff22}
-@keyframes studioSpin{from{transform:perspective(500px) rotateY(0deg)}to{transform:perspective(500px) rotateY(360deg)}}
+#play:hover,#play:focus{background:linear-gradient(180deg,#3a3630,#221f1b);border-color:#d4c4a0;box-shadow:0 0 22px #c4b89a33,inset 0 1px 0 #ffffff18;outline:none}
+#play:active{transform:translateY(1px) scale(.98)}
+#startHints{font-size:10px;letter-spacing:1.5px;color:#6a655c;line-height:1.8;margin:0 0 16px}
+#studioCredit{margin-top:4px;color:#5a564e;font-size:9px;letter-spacing:3px;text-shadow:0 0 8px #ffffff11}
 button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa;touch-action:none;user-select:none;-webkit-user-select:none}
-#play{padding:15px 32px;letter-spacing:3px;margin:18px;cursor:pointer}
+#start.hidden{opacity:0;pointer-events:none;transition:opacity .45s ease}
 #mobile{display:none;position:fixed;inset:0;z-index:4;pointer-events:none}
 #joystick{position:absolute;left:22px;bottom:28px;width:142px;height:142px;border:2px solid #ffffff75;border-radius:50%;background:#2225;pointer-events:auto;touch-action:none}
 #stick{position:absolute;left:43px;top:43px;width:52px;height:52px;border-radius:50%;background:#d0d0d080;border:2px solid #fff9;pointer-events:none}
@@ -100,7 +115,7 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 #mobile{display:block}
 #hint{bottom:185px;max-width:90%;white-space:normal;line-height:1.5}
 #hud{font-size:10px}
-#start h1{letter-spacing:5px}
+#start h1{letter-spacing:5px}#startPanel{padding:28px 18px 22px}
 #dialogueWrap{bottom:13%;width:90vw;max-width:90vw}
 #subtitle{font-size:12px;padding:9px 13px;line-height:1.55}
 }
@@ -148,11 +163,21 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 </div>
 
 <div id="start">
-  <h1>BLACKWOOD</h1>
-  <p>01:47 AM<br>GECE SIRADAN BİR GECEYDİ.</p>
-  <div id="loadingStatus" aria-live="polite">Veriler alınıyor...</div>
-  <button id="play" type="button">OYNA</button>
-  <div id="studioCredit">MADE BY KADIR'S STUDIOS</div>
+  <div id="startBg" aria-hidden="true"></div>
+  <div id="startGrain" aria-hidden="true"></div>
+  <div id="startVignette" aria-hidden="true"></div>
+  <div id="startPanel">
+    <div id="startBadge">KADIR'S STUDIOS</div>
+    <h1>BLACKWOOD</h1>
+    <p class="start-sub">01:47 AM</p>
+    <p class="start-tag">GECE SIRADAN BİR GECEYDİ.</p>
+    <div id="startDivider"></div>
+    <div id="loadingStatus" aria-live="polite">Veriler alınıyor...</div>
+    <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
+    <button id="play" type="button">OYNA</button>
+    <p id="startHints">PC: WASD · MOUSE · F FENER · X İÇ<br>MOBİL: JOYSTICK · ETKİLEŞ · FENER</p>
+    <div id="studioCredit">MADE BY KADIR'S STUDIOS · 2026</div>
+  </div>
 </div>
 
 <div id="responsibilityNotice" role="dialog" aria-modal="true" aria-labelledby="noticeTitle" style="display:none;position:fixed;inset:0;z-index:40;align-items:center;justify-content:center;padding:22px;background:rgba(0,0,0,.94);text-align:center;">
@@ -167,14 +192,27 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
-const W=480,H=270;
-const renderer=new THREE.WebGLRenderer({antialias:false});
+// Performans: düşük iç çözünürlük + yüksek yenileme (120Hz ekranlarda 120 FPS).
+const IS_MOBILE=matchMedia('(pointer:coarse),(max-width:900px)').matches;
+let W=IS_MOBILE?400:560, H=IS_MOBILE?225:315;
+const renderer=new THREE.WebGLRenderer({
+  antialias:false,
+  alpha:false,
+  powerPreference:'high-performance',
+  stencil:false,
+  depth:true
+});
 renderer.setPixelRatio(1);
 renderer.setSize(W,H,false);
 renderer.domElement.style.width='100vw';
 renderer.domElement.style.height='100vh';
+renderer.domElement.style.display='block';
 renderer.outputColorSpace=THREE.SRGBColorSpace;
+// Gölge yok, otomatik temizleme açık.
+renderer.shadowMap.enabled=false;
 document.getElementById('game').appendChild(renderer.domElement);
+// Materyal/geometri paylaşımlı kullanım için.
+THREE.Cache.enabled=true;
 
 const scene=new THREE.Scene();
 // Açılışta odanın ortasında beliren deney görevlisi.
@@ -243,11 +281,11 @@ function group(parent,x=0,y=0,z=0){
 // IŞIKLAR
 scene.add(new THREE.HemisphereLight(0xfff1db,0x51483e,2));
 
-const roomLight=new THREE.PointLight(0xffe0b1,2.4,18);
+const roomLight=new THREE.PointLight(0xffe0b1,IS_MOBILE?1.6:2.2,IS_MOBILE?14:18);
 roomLight.position.set(0,2.8,0);
 scene.add(roomLight);
 
-const fillLight=new THREE.PointLight(0xffe9d1,1.2,12);
+const fillLight=new THREE.PointLight(0xffe9d1,IS_MOBILE?.7:1.0,IS_MOBILE?9:12);
 fillLight.position.set(2,2.2,2);
 scene.add(fillLight);
 
@@ -450,8 +488,9 @@ teemoMushroom.add(mushroomNote);
 // Yeşil duman parçacıkları, mantar etkinleşince görünür.
 const mushroomSmoke=[];
 const smokeMaterial=new THREE.MeshBasicMaterial({color:0x55e66b,transparent:true,opacity:0,depthWrite:false});
-for(let i=0;i<18;i++){
-  const puff=new THREE.Mesh(new THREE.SphereGeometry(.18+Math.random()*.13,10,8),smokeMaterial.clone());
+const smokeCount=IS_MOBILE?8:14;
+for(let i=0;i<smokeCount;i++){
+  const puff=new THREE.Mesh(new THREE.SphereGeometry(.18+Math.random()*.13,8,6),smokeMaterial.clone());
   puff.visible=false;scene.add(puff);mushroomSmoke.push({mesh:puff,phase:i/18* Math.PI*2,life:0});
 }
 let mushroomUsed=false,mushroomEffectTime=0;
@@ -514,7 +553,8 @@ function drawTinyBubble(bubble,phrase){
   ctx.save();ctx.translate(256,59);ctx.rotate((Math.random()-.5)*.018);ctx.fillText(text,0,0);ctx.restore();
   bubble.texture.needsUpdate=true;
 }
-for(let i=0;i<tinyAnchors.length;i++){
+const tinyLimit=IS_MOBILE?Math.min(12,tinyAnchors.length):tinyAnchors.length;
+for(let i=0;i<tinyLimit;i++){
   const person=new THREE.Group();
   const clothes=tinyClothes[i%tinyClothes.length];
   const torso=new THREE.Mesh(new THREE.CylinderGeometry(.055,.075,.15,8),clothes);
@@ -2182,6 +2222,15 @@ function makeBloodStain(seed){
 }
 const backroomsChunks=new Map();
 const BACK_CELL=8, BACK_CHUNK_CELLS=4, BACK_CHUNK_SIZE=BACK_CELL*BACK_CHUNK_CELLS;
+// Paylaşılan backrooms materyal/geometri (kasma azaltır).
+const BACK_FLOOR_MAT=new THREE.MeshLambertMaterial({color:0x8c8155});
+const BACK_WALL_MAT=new THREE.MeshLambertMaterial({color:0xc9bd7e});
+const BACK_CEIL_MAT=new THREE.MeshLambertMaterial({color:0xb7ad79});
+const BACK_PANEL_MAT=new THREE.MeshBasicMaterial({color:0xffe6a0});
+const BACK_FLOOR_GEO=new THREE.PlaneGeometry(BACK_CHUNK_SIZE,BACK_CHUNK_SIZE);
+const BACK_PANEL_GEO=new THREE.BoxGeometry(2.5,.08,1.2);
+let lastBackCX=null,lastBackCZ=null;
+const BACK_RADIUS=IS_MOBILE?1:2;
 function backHash(x,z,salt=0){
   let n=Math.imul(x+salt,374761393)+Math.imul(z-salt,668265263)|0;
   n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295;
@@ -2189,11 +2238,8 @@ function backHash(x,z,salt=0){
 function buildBackroomsChunk(cx,cz){
   const key=`${cx},${cz}`;if(backroomsChunks.has(key))return;
   const group=new THREE.Group();group.position.set(cx*BACK_CHUNK_SIZE,0,cz*BACK_CHUNK_SIZE);backroomsScene.add(group);
-  const floorMat=new THREE.MeshLambertMaterial({color:0x8c8155});
-  const wallMat=new THREE.MeshLambertMaterial({color:0xc9bd7e});
-  const ceilingMat=new THREE.MeshLambertMaterial({color:0xb7ad79});
-  const floor=new THREE.Mesh(new THREE.PlaneGeometry(BACK_CHUNK_SIZE,BACK_CHUNK_SIZE),floorMat);floor.rotation.x=-Math.PI/2;floor.position.set(BACK_CHUNK_SIZE/2,.0,BACK_CHUNK_SIZE/2);group.add(floor);
-  const ceiling=new THREE.Mesh(new THREE.PlaneGeometry(BACK_CHUNK_SIZE,BACK_CHUNK_SIZE),ceilingMat);ceiling.rotation.x=Math.PI/2;ceiling.position.set(BACK_CHUNK_SIZE/2,4,BACK_CHUNK_SIZE/2);group.add(ceiling);
+  const floor=new THREE.Mesh(BACK_FLOOR_GEO,BACK_FLOOR_MAT);floor.rotation.x=-Math.PI/2;floor.position.set(BACK_CHUNK_SIZE/2,.0,BACK_CHUNK_SIZE/2);group.add(floor);
+  const ceiling=new THREE.Mesh(BACK_FLOOR_GEO,BACK_CEIL_MAT);ceiling.rotation.x=Math.PI/2;ceiling.position.set(BACK_CHUNK_SIZE/2,4,BACK_CHUNK_SIZE/2);group.add(ceiling);
   const wallH=4,wallT=.34, colliders=[];
   // Her hücrenin kenarı dünya koordinatına göre belirlenir. Böylece chunk sınırlarında duvarlar devam eder.
   for(let ix=0;ix<BACK_CHUNK_CELLS;ix++)for(let iz=0;iz<BACK_CHUNK_CELLS;iz++){
@@ -2208,7 +2254,7 @@ function buildBackroomsChunk(cx,cz){
     ];
     for(let ei=0;ei<edges.length;ei++){const e=edges[ei];if(!e.on)continue;
       const horizontal=e.hx>e.hz;
-      const wall=new THREE.Mesh(new THREE.BoxGeometry(horizontal?BACK_CELL+wallT:wallT,wallH,horizontal?wallT:BACK_CELL+wallT),wallMat);
+      const wall=new THREE.Mesh(new THREE.BoxGeometry(horizontal?BACK_CELL+wallT:wallT,wallH,horizontal?wallT:BACK_CELL+wallT),BACK_WALL_MAT);
       wall.position.set(e.px,wallH/2,e.pz);group.add(wall);
       colliders.push({x:cx*BACK_CHUNK_SIZE+e.px,z:cz*BACK_CHUNK_SIZE+e.pz,hx:e.hx+.18,hz:e.hz+.18});
       // Grafitiler yalnızca seyrek duvarlarda, koridor boyunca aralıklı görünür.
@@ -2244,28 +2290,46 @@ function buildBackroomsChunk(cx,cz){
       }
     }
   }
-  // Floresanların çoğu bozuk; yalnızca yaklaşık beşte biri yanar.
+  // Floresan paneller: çoğu sadece emissive panel (PointLight pahalı). Az sayıda gerçek ışık.
   const lights=[];
   for(let x=4;x<BACK_CHUNK_SIZE;x+=16)for(let z=4;z<BACK_CHUNK_SIZE;z+=16){
     const gx=cx*BACK_CHUNK_CELLS+Math.floor(x/BACK_CELL),gz=cz*BACK_CHUNK_CELLS+Math.floor(z/BACK_CELL);
-    if(backHash(gx,gz,301)<.78)continue;
-    const panel=new THREE.Mesh(new THREE.BoxGeometry(2.5,.08,1.2),new THREE.MeshBasicMaterial({color:0xffe6a0}));panel.position.set(x,3.94,z);group.add(panel);
-    const light=new THREE.PointLight(0xffe9a0,.22,10);light.position.set(x,3.65,z);group.add(light);
-    lights.push({light,panel,lx:x,lz:z,baseIntensity:.22,baseColor:0xffe6a0});
+    if(backHash(gx,gz,301)<.82)continue;
+    const panel=new THREE.Mesh(BACK_PANEL_GEO,BACK_PANEL_MAT);panel.position.set(x,3.94,z);group.add(panel);
+    // Gerçek PointLight yalnızca seyrek: mobil daha az.
+    let light=null;
+    const wantLight=backHash(gx,gz,404)>(IS_MOBILE?.92:.78);
+    if(wantLight){
+      light=new THREE.PointLight(0xffe9a0,IS_MOBILE?.14:.2,IS_MOBILE?7:10);
+      light.position.set(x,3.65,z);
+      light.distance=IS_MOBILE?7:10;
+      group.add(light);
+    }
+    lights.push({light,panel,lx:x,lz:z,baseIntensity:light?light.intensity:.2,baseColor:0xffe6a0});
   }
   backroomsChunks.set(key,{group,colliders,lights});backroomsColliders.push(...colliders);
 }
 function updateBackroomsChunks(){
-  const cx=Math.floor(player.x/BACK_CHUNK_SIZE),cz=Math.floor(player.z/BACK_CHUNK_SIZE),keep=new Set();
-  for(let x=cx-2;x<=cx+2;x++)for(let z=cz-2;z<=cz+2;z++){const key=`${x},${z}`;keep.add(key);buildBackroomsChunk(x,z);}
+  const cx=Math.floor(player.x/BACK_CHUNK_SIZE),cz=Math.floor(player.z/BACK_CHUNK_SIZE);
+  // Chunk hücresi değişmediyse atla (her karede rebuild yok).
+  if(cx===lastBackCX&&cz===lastBackCZ&&backroomsChunks.size)return;
+  lastBackCX=cx;lastBackCZ=cz;
+  const keep=new Set();
+  const rad=BACK_RADIUS;
+  for(let x=cx-rad;x<=cx+rad;x++)for(let z=cz-rad;z<=cz+rad;z++){const key=`${x},${z}`;keep.add(key);buildBackroomsChunk(x,z);}
   for(const [key,data] of backroomsChunks){if(keep.has(key))continue;
     try{
       backroomsScene.remove(data.group);
       data.group.traverse(o=>{
-        if(o.geometry){try{o.geometry.dispose();}catch(_){}}
+        // Paylaşılan material/geometry dispose etme.
+        if(o.geometry&&o.geometry!==BACK_FLOOR_GEO&&o.geometry!==BACK_PANEL_GEO){try{o.geometry.dispose();}catch(_){}}
+        if(o.isLight){/* light removed with group */}
         if(o.material){
           const mats=Array.isArray(o.material)?o.material:[o.material];
-          for(const m of mats){try{if(m.map)m.map.dispose();m.dispose();}catch(_){}}
+          for(const m of mats){
+            if(m===BACK_FLOOR_MAT||m===BACK_WALL_MAT||m===BACK_CEIL_MAT||m===BACK_PANEL_MAT)continue;
+            try{if(m.map)m.map.dispose();m.dispose();}catch(_){}
+          }
         }
       });
     }catch(err){console.warn('Backrooms chunk temizleme:',err);}
@@ -2274,7 +2338,7 @@ function updateBackroomsChunks(){
   backroomsColliders.length=0;for(const data of backroomsChunks.values())backroomsColliders.push(...data.colliders);
 }
 function buildBackrooms(){updateBackroomsChunks();}
-buildBackrooms();
+// Backrooms chunk'ları girince üretilir (açılış kasmasını önler).
 
 const forestChunks=new Map(), forestColliders=[];
 const forestSilhouettes=[];
@@ -2644,7 +2708,7 @@ function makeForestChunk(cx,cz){
   let seed=(Math.imul(cx,73856093)^Math.imul(cz,19349663))>>>0;
   const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   const trees=[];
-  for(let i=0;i<42;i++){
+  for(let i=0;i<(IS_MOBILE?24:32);i++){
     const x=ox+(rnd()-.5)*(CHUNK_SIZE-2), z=oz+(rnd()-.5)*(CHUNK_SIZE-2);
     // Oyuncunun başlangıç alanı, göl kıyısı ve yapı çevreleri boş kalır.
     if(Math.hypot(x,z)<7.2)continue;
@@ -2668,7 +2732,7 @@ function makeForestChunk(cx,cz){
     chunk.add(trunks,crowns);
   }
   // Çalı kümeleri, ağaç ve yapı alanlarından ayrı noktalara yerleştirilir.
-  for(let i=0;i<15;i++){
+  for(let i=0;i<(IS_MOBILE?6:10);i++){
     const bx=ox+(rnd()-.5)*(CHUNK_SIZE-2),bz=oz+(rnd()-.5)*(CHUNK_SIZE-2);
     if(Math.hypot(bx,bz)<5.5)continue;
     if(lakeSites.some(l=>Math.hypot(bx-l.x,bz-l.z)<l.r+2.5))continue;
@@ -2700,8 +2764,11 @@ function makeForestChunk(cx,cz){
   // Dereler kaldırıldı. Haritada yalnızca tek büyük göl bulunur.
   forestScene.add(chunk); forestChunks.set(`${cx},${cz}`,chunk);
 }
+let lastForestCX=null,lastForestCZ=null;
 function updateForestChunks(){
   const cx=Math.floor(player.x/CHUNK_SIZE), cz=Math.floor(player.z/CHUNK_SIZE);
+  if(cx===lastForestCX&&cz===lastForestCZ&&forestChunks.size)return;
+  lastForestCX=cx;lastForestCZ=cz;
   for(let x=cx-CHUNK_RADIUS;x<=cx+CHUNK_RADIUS;x++) for(let z=cz-CHUNK_RADIUS;z<=cz+CHUNK_RADIUS;z++){
     const key=`${x},${z}`; if(!forestChunks.has(key))makeForestChunk(x,z);
   }
@@ -2715,6 +2782,7 @@ function updateForestChunks(){
   }
 }
 function enterForest(){
+  lastForestCX=null;lastForestCZ=null;
   hasSeenSilhouette=false;firstThoughtIndex=0;thoughtBag=[];encounterThoughtBag=[];thoughtCooldown=4+Math.random()*3;
   stalkerDialogueActive=false;
   for(const timer of stalkerDialogueTimers)clearTimeout(timer);
@@ -3407,7 +3475,7 @@ function restoreNearbyBackroomsLights(){
   for(const data of backroomsChunks.values()){
     if(!data.lights)continue;
     for(const entry of data.lights){
-      entry.light.intensity=entry.baseIntensity;
+      if(entry.light)entry.light.intensity=entry.baseIntensity;
       if(entry.panel&&entry.panel.material)entry.panel.material.color.setHex(entry.baseColor);
     }
   }
@@ -3429,7 +3497,7 @@ function updateLuciWatchPulse(dt){
     if(luciPresenceActive){
       for(const entry of nearby){
         const flicker=.55+.45*Math.sin(elapsed*18+entry.wx*.3);
-        entry.light.intensity=entry.baseIntensity*flicker;
+        if(entry.light)entry.light.intensity=entry.baseIntensity*flicker;
         if(entry.panel&&entry.panel.material){
           const c=flicker>.7?entry.baseColor:0x5a5230;
           entry.panel.material.color.setHex(c);
@@ -3451,7 +3519,7 @@ function updateLuciWatchPulse(dt){
       backroomsFlashlightFill.intensity=0;
     }
     for(const entry of nearby){
-      entry.light.intensity=0;
+      if(entry.light)entry.light.intensity=0;
       if(entry.panel&&entry.panel.material)entry.panel.material.color.setHex(0x2a2618);
     }
     if(luciPulseTimer<=0){
@@ -3466,7 +3534,7 @@ function updateLuciWatchPulse(dt){
       backroomsFlashlightFill.intensity=5;
     }
     for(const entry of nearby){
-      entry.light.intensity=entry.baseIntensity;
+      if(entry.light)entry.light.intensity=entry.baseIntensity;
       if(entry.panel&&entry.panel.material)entry.panel.material.color.setHex(entry.baseColor);
     }
     if(luciPulseTimer<=0){
@@ -3572,6 +3640,7 @@ function updateBackroomsItems(dt){
 }
 
 function enterBackrooms(){
+  lastBackCX=null;lastBackCZ=null;
   forestActive=false;backroomsActive=true;collapseStarted=false;collapseTime=0;movementLocked=false;
   backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;luciRevealTime=0;luciTeleportCooldown=2;luciAttackCooldown=0;luciScareCooldown=0;luciCollapsing=false;luciCollapseTime=0;luciPresenceActive=false;luciPresenceTime=0;luciTalkCooldown=3.5;luciPulseQueue=0;luciPulseTimer=0;luciPulsePhase=0;luciNameRevealed=false;luciExchangesExhausted=false;luciStoryIndex=0;luciExchangeActive=false;luciExchangeQueue=[];luciExchangeTimer=0;luciExchangeBag=[];if(luciGhost)luciGhost.visible=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
   if(backroomsGuide)backroomsGuide.visible=false;
@@ -3678,6 +3747,11 @@ function updateSurvivalHud(dt){
   }else{
     stamina=Math.min(100,stamina+(stamina<18?10:17)*dt);
   }
+  // DOM güncellemesi ~12 Hz (her karede style yazmak kasır).
+  if(typeof updateSurvivalHud._acc!=='number')updateSurvivalHud._acc=0;
+  updateSurvivalHud._acc+=dt;
+  if(updateSurvivalHud._acc<0.08)return;
+  updateSurvivalHud._acc=0;
   const pct=Math.round(stamina), spd=stamina<20?Math.max(.48,1.05-stamina/30):1.05;
   staminaFill.style.width=pct+'%'; staminaValue.textContent=pct+'%';
   heartIcon.style.animationDuration=spd+'s';
@@ -3857,45 +3931,50 @@ document.getElementById('drinkButton').addEventListener('pointerdown',e=>{e.stop
 const clock=new THREE.Clock();
 
 function animate(){
-  requestAnimationFrame(animate);
   try{
     const dt=Math.min(clock.getDelta(),.05);
     elapsed+=dt;
-    const targetFov=zoomEnabled?zoomCameraFov:normalCameraFov;
-    const nextFov=THREE.MathUtils.damp(camera.fov,targetFov,9,dt);
-    if(Math.abs(camera.fov-nextFov)>.001){camera.fov=nextFov;camera.updateProjectionMatrix();}
+    // Menüdeyken sadece oda render (güncelleme yok = kasma yok).
+    if(!started){
+      const activeScene=scene;
+      if(camera.parent!==activeScene){if(camera.parent)camera.parent.remove(camera);activeScene.add(camera);}
+      renderer.render(activeScene,camera);
+      return;
+    }
+    if(zoomEnabled||Math.abs(camera.fov-normalCameraFov)>.05){
+      const targetFov=zoomEnabled?zoomCameraFov:normalCameraFov;
+      const nextFov=THREE.MathUtils.damp(camera.fov,targetFov,9,dt);
+      if(Math.abs(camera.fov-nextFov)>.001){camera.fov=nextFov;camera.updateProjectionMatrix();}
+    }
 
     updateMovement(dt);
-    updateBedroomStayDialogue(dt);
-    updateBackroomsEncounter(dt);
-    updateBackroomsItems(dt);
-    updateLuciCollapse(dt);
-    updateLuciGhost(dt);
-    updateSurvivalHud(dt);
-    updateMentalState(dt);
-    updateSleep(dt);
-    updateScare(dt);
-    updatePot(dt);
-    updatePlantJump(dt);
-    updatePotHint();
-    updateFlashlightAnimation(dt);
-    updateForestSilhouettes(dt);
-    updateStalkerEffects(dt);
-    updateMushroomEffect(dt);
-    updateComputerAutoDialogue(dt);
+    if(!forestActive&&!backroomsActive){
+      updateBedroomStayDialogue(dt);
+      updateSleep(dt);
+      updateScare(dt);
+      updatePot(dt);
+      updatePlantJump(dt);
+      updatePotHint();
+      updateMushroomEffect(dt);
+      updateComputerAutoDialogue(dt);
+    }else if(forestActive){
+      updateSurvivalHud(dt);
+      updateMentalState(dt);
+      updateForestSilhouettes(dt);
+      updateStalkerEffects(dt);
+      updateFlashlightAnimation(dt);
+    }else if(backroomsActive){
+      updateBackroomsEncounter(dt);
+      updateBackroomsItems(dt);
+      updateLuciCollapse(dt);
+      updateLuciGhost(dt);
+      updateFlashlightAnimation(dt);
+    }
 
-    // Kamerayı aktif sahneye bağla: eldeki fener/içecek modelleri görünsün,
-    // sahne değişiminde boş/beyaz kare oluşmasın.
     const activeScene=backroomsActive?backroomsScene:(forestActive?forestScene:scene);
     if(camera.parent!==activeScene){
       if(camera.parent)camera.parent.remove(camera);
       activeScene.add(camera);
-    }
-    // Canvas CSS boyutunu koru (bazı tarayıcılarda stil sıfırlanıp sol üstte küçük kare kalıyordu).
-    if(renderer.domElement.style.width!=='100vw'){
-      renderer.domElement.style.width='100vw';
-      renderer.domElement.style.height='100vh';
-      renderer.domElement.style.display='block';
     }
     renderer.render(activeScene,camera);
   }catch(err){
@@ -3943,21 +4022,27 @@ const loadingMessages=[
 ];
 let loadingStep=0;
 loadingStatus.textContent=loadingMessages[0];
+const loadingBarFill=document.getElementById('loadingBarFill');
+if(loadingBarFill)loadingBarFill.style.width='12%';
 const loadingInterval=setInterval(()=>{
   loadingStep++;
   if(loadingStep<loadingMessages.length){
     loadingStatus.textContent=loadingMessages[loadingStep];
+    if(loadingBarFill)loadingBarFill.style.width=Math.min(100,12+loadingStep*22)+'%';
   }
   if(loadingStep>=loadingMessages.length-1){
     clearInterval(loadingInterval);
+    if(loadingBarFill)loadingBarFill.style.width='100%';
     playButton.classList.add('ready');
   }
-},2500);
+},900);
 
 // OYUN ÖNCESİ BİLGİLENDİRME VE BAŞLATMA
 const responsibilityNotice=document.getElementById('responsibilityNotice');
 document.getElementById('play').addEventListener('click',()=>{
-  document.getElementById('start').style.display='none';
+  const startEl=document.getElementById('start');
+  startEl.classList.add('hidden');
+  setTimeout(()=>{startEl.style.display='none';},450);
   responsibilityNotice.style.display='flex';
 });
 document.getElementById('noticeContinue').addEventListener('click',()=>{
@@ -3974,7 +4059,7 @@ document.getElementById('noticeContinue').addEventListener('click',()=>{
   }
 });
 
-animate();
+renderer.setAnimationLoop(animate);
 
 window.addEventListener('resize',()=>{
   renderer.setSize(W,H,false);
