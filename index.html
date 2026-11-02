@@ -1457,14 +1457,15 @@ function showSubtitle(message){
 
     if(char!==' '&&char!=='.'&&char!==',')typeSound();
     index++;
-  },42);
+  },78);
 
   clearTimeout(showSubtitle.hideTimer);
 
+  // Metin daha yavaş yazılır; altyazı tamamlandıktan sonra da okunabilecek kadar kalır.
   showSubtitle.hideTimer=setTimeout(()=>{
     clearInterval(subtitleTimer);
     subtitle.classList.remove('visible');
-  },Math.max(4500,message.length*42+2200));
+  },Math.max(6000,message.length*78+3200));
 }
 
 // Açılış diyaloğu: konuşmacı adı metin kutusunun sol üstünde görünür.
@@ -2443,23 +2444,7 @@ function updateStalkerEffects(dt){
       if(reaction)setTimeout(()=>{if(forestActive&&!sleeping&&!waking)showSubtitle(reaction);},450);
     }
   }
-  thoughtCooldown-=dt;
-  // İlk silüet görülene kadar mekânı ve buraya geliş nedenini sorgular.
-  // İlk karşılaşmadan sonra iç konuşmalar gölgeler ve benlik üzerine yoğunlaşır.
-  if(!hasSeenSilhouette){
-    const firstVisible=forestSilhouettes.some(s=>s.mesh.visible&&Math.hypot(s.x-player.x,s.z-player.z)<23);
-    if(firstVisible){hasSeenSilhouette=true;thoughtCooldown=1.2;}
-  }
-  if(!stalkerScareActive&&!stalkerDialogueActive&&thoughtCooldown<=0&&!sleeping&&!waking&&!scareActive){
-    if(!hasSeenSilhouette&&firstThoughtIndex<firstEncounterThoughts.length){
-      showSubtitle(firstEncounterThoughts[firstThoughtIndex++]);
-      thoughtCooldown=10+Math.random()*7;
-    }else{
-      const thought=hasSeenSilhouette?nextEncounterThought():nextExistentialThought();
-      if(thought)showSubtitle(thought);
-      thoughtCooldown=hasSeenSilhouette?14+Math.random()*10:17+Math.random()*13;
-    }
-  }
+
 }
 function makeForestChunk(cx,cz){
   const chunk=new THREE.Group(), ox=cx*CHUNK_SIZE, oz=cz*CHUNK_SIZE;
