@@ -94,7 +94,7 @@ button{font-family:monospace;color:#fff;background:#24252b;border:1px solid #aaa
 #eyelids.closed::after{animation:heavyBlinkBottom 3.2s cubic-bezier(.42,0,.7,1) forwards}
 @keyframes heavyBlinkTop{0%,9%{transform:translateY(-105%)}17%{transform:translateY(-8%)}23%{transform:translateY(-105%)}34%{transform:translateY(-105%)}45%{transform:translateY(-2%)}53%{transform:translateY(-105%)}67%{transform:translateY(-105%)}82%,100%{transform:translateY(0)}}
 @keyframes heavyBlinkBottom{0%,9%{transform:translateY(105%)}17%{transform:translateY(8%)}23%{transform:translateY(105%)}34%{transform:translateY(105%)}45%{transform:translateY(2%)}53%{transform:translateY(105%)}67%{transform:translateY(105%)}82%,100%{transform:translateY(0)}}
-.subtitle-char{display:inline-block;opacity:0;animation:letterDrop .16s ease-out forwards}
+.subtitle-char{display:inline-block;opacity:0;animation:letterDrop .07s ease-out forwards}
 @keyframes letterDrop{0%{opacity:0;transform:translateY(-13px)}65%{opacity:1;transform:translateY(3px)}100%{opacity:1;transform:translateY(0)}}
 @media(pointer:coarse),(max-width:800px){
 #mobile{display:block}
@@ -1442,7 +1442,7 @@ function playScream(){
 }
 
 // ALTYAZI
-function showSubtitle(message, typingSpeed=78){
+function showSubtitle(message, typingSpeed=28){
   clearInterval(subtitleTimer);
   subtitle.innerHTML='';
   subtitle.classList.add('visible');
@@ -2297,11 +2297,19 @@ function startStalkerDialogue(){
   stalkerDialogueActive=true;
   const line=nextStalkerTaunt();
   if(!line){stalkerDialogueActive=false;return;}
-  // Silüetlerin replikleri daha hızlı yazılır; diğer karakter repliklerinin hızı değişmez.
-  showSubtitle(line,48);
-  const duration=Math.max(4200,line.length*70+1800);
+  // Silüet replikleri daha seri yazılır ve replik süresine göre zamanlanır.
+  showSubtitle(line,18);
+  const duration=Math.max(2400,line.length*18+1400);
   const timer=setTimeout(()=>{stalkerDialogueActive=false;},duration);
   stalkerDialogueTimers.push(timer);
+  // Silüet konuşması bittikten 1 sn sonra karakter tepki verir.
+  const reaction=nextForestJumpscareReaction();
+  if(reaction){
+    const reactionTimer=setTimeout(()=>{
+      if(forestActive&&!sleeping&&!waking&&!stalkerDialogueActive)showSubtitle(reaction);
+    },duration+1000);
+    stalkerDialogueTimers.push(reactionTimer);
+  }
 }
 const forestJumpscareReactions=[
   'Dostum bunlar rüya..',
@@ -2464,8 +2472,7 @@ function updateStalkerEffects(dt){
     if(stalkerScareTime>.58){
       stalkerScareActive=false;stalkerLookTarget=null;stalkerScareMesh=null;
       for(const s of forestSilhouettes){s.mesh.visible=false;s.mesh.scale.setScalar(.9);}
-      const reaction=nextForestJumpscareReaction();
-      if(reaction)setTimeout(()=>{if(forestActive&&!sleeping&&!waking)showSubtitle(reaction);},450);
+      // Karakter tepkisi, silüet konuşması bittikten 1 sn sonra startStalkerDialogue içinde zamanlanır.
     }
   }
 
@@ -2939,7 +2946,7 @@ function startBackroomsEncounter(){
   backroomsGuide.position.set(player.x+forward.x*5,0,player.z+forward.z*5);
   backroomsGuide.lookAt(player.x,1.2,player.z);backroomsGuide.visible=true;
   stalkerDialogueActive=true;movementLocked=true;
-  showSubtitle('Ben sizin ruhani yardımcınızım! Şu an çok kötü bir durumdasınız...');
+  showSubtitle('selam!');
 }
 function updateBackroomsEncounter(dt){
   if(!backroomsActive)return;
@@ -2951,16 +2958,15 @@ function updateBackroomsEncounter(dt){
   if(!stalkerDialogueActive)return;
   backroomsEncounterStepTime+=dt;
   const lines=[
-    {at:7,text:'Amaan neyse, herkes ölmeyecek mi zaten? Neyse...'},
-    {at:13,text:'Siz benimle dalga mı geçiyorsunuz lan!'},
-    {at:16,text:'Kendi zihninizde mahsur kaldınız.'},
-    {at:20,text:'Güler... Bekler... Pardon, sadece alışkanlık.'},
-    {at:27,text:'Size zamanı geldiğinde yardımcı olacağım.'},
-    {at:35,text:'Şimdilik bu kadar. Fazla ses çıkarmamanızı tavsiye ederim, bay bay!'}
+    {at:4,text:'ben senin rehber varlığınım dostum.'},
+    {at:9,text:'şuan bilinç altında kaybolmuş durumdasın...'},
+    {at:15,text:'kabusların sana zarar vermeye çalışabilir bu çok muhtemel...'},
+    {at:22,text:'ama için rahat olsun en fazla başka düşüncelere geçiş yaparsınız..'},
+    {at:29,text:'ama kendi benliğinizi unutmayın. unutursanız ölürsünüz..'},
+    {at:36,text:'şimdilik ben gidiyorum sizin için bir çıkış arayacağım! fazla ses çıkarmayın o sesten hoşlanmaz..'}
   ];
   if(backroomsEncounterStep<lines.length&&backroomsEncounterStepTime>=lines[backroomsEncounterStep].at){
     const line=lines[backroomsEncounterStep];showSubtitle(line.text);
-    if(backroomsEncounterStep===1)backroomsEncounterWobble=1.8;
     backroomsEncounterStep++;
   }
   if(backroomsEncounterWobble>0){
@@ -2968,7 +2974,7 @@ function updateBackroomsEncounter(dt){
     const amount=backroomsEncounterWobble>0?Math.sin(elapsed*48)*.045:0;
     camera.rotation.z=amount;
   }
-  if(backroomsEncounterStep>=lines.length&&backroomsEncounterStepTime>=40){
+  if(backroomsEncounterStep>=lines.length&&backroomsEncounterStepTime>=44){
     stalkerDialogueActive=false;movementLocked=false;
     if(backroomsGuide)backroomsGuide.visible=false;
     guideFinished=true;spawnAlmondWaters();
