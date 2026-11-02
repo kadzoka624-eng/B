@@ -1642,6 +1642,9 @@ async function enterFullscreenFromInteraction(){
     if(request){try{const result=request.call(target);if(result&&result.catch)await result.catch(()=>{});}catch(_){}}
   }
 }
+let computerInteractCount=0;
+let postTinyPeopleDialogueShown=false;
+
 function interact(){
   if(!started||sleeping||sleepAnimation||waking)return;
 
@@ -1679,7 +1682,17 @@ function interact(){
     }
   }
   else if(nearComputer()){
-    showSubtitle('Oyun yapmaktan ne anlıyorlar, anlamıyorum.');
+    computerInteractCount++;
+    if(computerInteractCount===1){
+      showSubtitle('Oyun yapmaktan ne anlıyorlar, anlamıyorum.');
+    }else if(computerInteractCount===2){
+      showSubtitle('Bari rüyamda sal... Rüyamı oyun oynayarak geçirmeyeceğim. Aradığımız şeyi bulalım.');
+    }else if(mushroomUsed&&mushroomEffectTime===0&&!postTinyPeopleDialogueShown){
+      postTinyPeopleDialogueShown=true;
+      showSubtitle('Dostum... Instagramı azaltmalıyım...');
+    }else{
+      showSubtitle('Rüyamda bile ekran başındayım...');
+    }
     hint.textContent='MASADAKİ BİLGİSAYARA BAKIYORSUN.';
   }
   else if(nearBookshelf()){
