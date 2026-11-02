@@ -3643,6 +3643,9 @@ function updateBackroomsItems(dt){
 function enterBackrooms(){
   lastBackCX=null;lastBackCZ=null;
   forestActive=false;backroomsActive=true;collapseStarted=false;collapseTime=0;movementLocked=false;
+  // Orman HUD (stamina / akıl sağlığı) backrooms'ta görünmesin.
+  const survivalHud=document.getElementById('survivalHud');
+  if(survivalHud)survivalHud.style.display='none';
   backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;luciRevealTime=0;luciTeleportCooldown=2;luciAttackCooldown=0;luciScareCooldown=0;luciCollapsing=false;luciCollapseTime=0;luciPresenceActive=false;luciPresenceTime=0;luciTalkCooldown=3.5;luciPulseQueue=0;luciPulseTimer=0;luciPulsePhase=0;luciNameRevealed=false;luciExchangesExhausted=false;luciStoryIndex=0;luciExchangeActive=false;luciExchangeQueue=[];luciExchangeTimer=0;luciExchangeBag=[];if(luciGhost)luciGhost.visible=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
   if(backroomsGuide)backroomsGuide.visible=false;
   startBackroomsAmbience();
@@ -3970,6 +3973,8 @@ function animate(){
       updateStalkerEffects(dt);
       updateFlashlightAnimation(dt);
     }else if(backroomsActive){
+      const sh=document.getElementById('survivalHud');
+      if(sh&&sh.style.display!=='none')sh.style.display='none';
       updateBackroomsEncounter(dt);
       updateBackroomsItems(dt);
       updateLuciCollapse(dt);
