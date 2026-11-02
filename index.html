@@ -38,7 +38,7 @@ canvas{display:block}
 #backroomsHud{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:6;width:min(270px,42vw);display:none;pointer-events:none;text-align:center;font-size:10px;letter-spacing:2px;color:#d8d0ad;text-shadow:0 2px 5px #000}
 #sleepTrack{height:10px;margin-top:7px;padding:1px;background:#080907;border:1px solid #a99a6d88;box-shadow:0 2px 10px #0009}
 #sleepFill{height:100%;width:0;background:linear-gradient(90deg,#8c9a70,#d4b76f,#b34c3e);transition:width .2s linear}
-#alertHud{position:fixed;top:14px;left:14px;z-index:7;display:none;width:118px;padding:7px 9px;background:rgba(12,10,9,.86);border:1px solid #b99b7a88;color:#e9d8c3;font-size:12px;letter-spacing:2px;pointer-events:none;text-shadow:0 1px 4px #000}#alertTrack{height:7px;margin-top:6px;background:#080707;border:1px solid #80685b;overflow:hidden}#alertFill{height:100%;width:0;background:linear-gradient(90deg,#b18a58,#c94d36,#ff241c);box-shadow:0 0 8px #e43b2d;transition:width .12s linear}#sprintBtn{width:70px;height:48px;border-radius:15px;font-size:24px;background:#273126e8;border:1px solid #b9c9a099;box-shadow:0 3px 12px #0008;touch-action:none}#sprintBtn.active{background:#a8bd83;color:#111;border-color:#efffd4;box-shadow:0 0 18px #a8bd8388}#waterCounter{position:fixed;top:14px;right:16px;z-index:6;display:none;padding:9px 12px;background:rgba(8,13,16,.88);border:1px solid #91b7c477;color:#e0e8e9;font-size:12px;letter-spacing:1px;pointer-events:none}#drinkButton{display:none;position:fixed;top:54px;right:16px;z-index:12;width:34px;height:30px;background:#182126eF;border:1px solid #b8c7bd99;color:#fff;font-size:15px;cursor:pointer;pointer-events:auto}#drinkFlash{display:none;position:fixed;left:50%;top:58%;transform:translate(-50%,-50%);z-index:13;padding:14px 20px;background:#101719eF;border:1px solid #b8c7bd99;color:#e7eddf;letter-spacing:2px;font-size:12px;pointer-events:none}#drinkFlash.show{display:block;animation:drinkAnim .9s ease both}@keyframes drinkAnim{0%{opacity:0;transform:translate(-50%,-35%) scale(.7)}20%,75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-70%) scale(.9)}}
+#alertHud{position:fixed;top:92px;left:14px;z-index:7;display:none;width:118px;padding:7px 9px;background:rgba(12,10,9,.86);border:1px solid #b99b7a88;color:#e9d8c3;font-size:12px;letter-spacing:2px;pointer-events:none;text-shadow:0 1px 4px #000}#alertTrack{height:7px;margin-top:6px;background:#080707;border:1px solid #80685b;overflow:hidden}#alertFill{height:100%;width:0;background:linear-gradient(90deg,#b18a58,#c94d36,#ff241c);box-shadow:0 0 8px #e43b2d;transition:width .12s linear}#sprintBtn{width:70px;height:48px;border-radius:15px;font-size:24px;background:#273126e8;border:1px solid #b9c9a099;box-shadow:0 3px 12px #0008;touch-action:none}#sprintBtn.active{background:#a8bd83;color:#111;border-color:#efffd4;box-shadow:0 0 18px #a8bd8388}#waterCounter{position:fixed;top:14px;right:16px;z-index:6;display:none;padding:9px 12px;background:rgba(8,13,16,.88);border:1px solid #91b7c477;color:#e0e8e9;font-size:12px;letter-spacing:1px;pointer-events:none}#drinkButton{display:none;position:fixed;top:54px;right:16px;z-index:12;width:34px;height:30px;background:#182126eF;border:1px solid #b8c7bd99;color:#fff;font-size:15px;cursor:pointer;pointer-events:auto}#drinkFlash{display:none;position:fixed;left:50%;top:58%;transform:translate(-50%,-50%);z-index:13;padding:14px 20px;background:#101719eF;border:1px solid #b8c7bd99;color:#e7eddf;letter-spacing:2px;font-size:12px;pointer-events:none}#drinkFlash.show{display:block;animation:drinkAnim .9s ease both}@keyframes drinkAnim{0%{opacity:0;transform:translate(-50%,-35%) scale(.7)}20%,75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-70%) scale(.9)}}
 #crosshair{position:fixed;top:50%;left:50%;width:4px;height:4px;background:white;transform:translate(-50%,-50%);pointer-events:none}
 #hint{display:none!important}
 #vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse,transparent 55%,#0007 100%)}
@@ -2044,16 +2044,101 @@ const backGraffitiTexts=[
 'KAPIYI AÇMA!','BURASI AYNI YER DEĞİL!','SAATİM DURDU!','DUVARLAR DEĞİŞİYOR!','BENİ DUYABİLİYOR MUSUN?',
 'BURAYA NASIL GELDİM?','SAKIN UYUMA!','SESİNİ DUYUYORUM!','ÇIKIŞ YALAN!','KOŞMA, SENİ DUYAR!','BİRİ BENİ İZLİYOR!'
 ];
-function makeBackGraffiti(text){
-  const canvas=document.createElement('canvas');canvas.width=512;canvas.height=128;
-  const ctx=canvas.getContext('2d');ctx.clearRect(0,0,512,128);
-  ctx.font='bold 44px Arial';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillStyle='#090909';ctx.fillText(text,256,64,490);
+function makeBackGraffiti(text,styleSeed=0){
+  const canvas=document.createElement('canvas');canvas.width=640;canvas.height=240;
+  const ctx=canvas.getContext('2d');ctx.clearRect(0,0,640,240);
+  const bloody=styleSeed>.55;
+  const runny=styleSeed>.35;
+  // El yazısı hissi: eğik, düzensiz harfler.
+  ctx.textAlign='left';ctx.textBaseline='middle';
+  const fontSize=36+Math.floor(styleSeed*10);
+  ctx.font='italic '+fontSize+'px "Segoe Script","Brush Script MT","Lucida Handwriting",cursive,serif';
+  const baseY=78+Math.floor((styleSeed-.5)*16);
+  let x=28;
+  const chars=[...text];
+  for(let i=0;i<chars.length;i++){
+    const ch=chars[i];
+    const wobble=(Math.sin(i*1.7+styleSeed*9)*.55+(styleSeed*i%1-.5)*.9);
+    const rot=(-.12+styleSeed*.2)+(i%3-1)*.04;
+    ctx.save();
+    ctx.translate(x,baseY+wobble*6);
+    ctx.rotate(rot);
+    ctx.fillStyle=bloody?'rgba(92,8,10,.95)':'rgba(18,14,10,.92)';
+    ctx.shadowColor=bloody?'rgba(70,0,0,.45)':'rgba(0,0,0,.35)';
+    ctx.shadowBlur=2;
+    ctx.fillText(ch,0,0);
+    // İkinci ince katman: yıpranmış mürekkep.
+    ctx.fillStyle=bloody?'rgba(140,20,18,.35)':'rgba(40,32,24,.28)';
+    ctx.fillText(ch,0.8,1.2);
+    ctx.restore();
+    x+=ctx.measureText(ch).width*(.82+((i*styleSeed)%1)*.12)+1.2;
+    if(x>600)break;
+  }
+  // Akan yazı / kan damlaları.
+  if(runny||bloody){
+    const dripCount=5+Math.floor(styleSeed*7);
+    for(let d=0;d<dripCount;d++){
+      const dx=40+((styleSeed*97+d*53)%520);
+      const dy=baseY+10;
+      const len=18+((styleSeed*40+d*17)%55);
+      const grad=ctx.createLinearGradient(dx,dy,dx,dy+len);
+      grad.addColorStop(0,bloody?'rgba(110,10,12,.85)':'rgba(25,20,16,.7)');
+      grad.addColorStop(1,bloody?'rgba(60,0,0,0)':'rgba(20,16,12,0)');
+      ctx.strokeStyle=grad;ctx.lineWidth=1.5+((d+styleSeed*3)%3)*.7;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(dx,dy);
+      ctx.quadraticCurveTo(dx+((d%2)?3:-3),dy+len*.45,dx+((d%3)-1)*2,dy+len);
+      ctx.stroke();
+      // Damla ucu
+      ctx.fillStyle=bloody?'rgba(90,6,8,.75)':'rgba(20,16,12,.55)';
+      ctx.beginPath();ctx.ellipse(dx+((d%3)-1)*2,dy+len,1.6,2.4,0,0,Math.PI*2);ctx.fill();
+    }
+  }
+  // Kan sıçratmaları
+  if(bloody){
+    for(let s=0;s<10;s++){
+      const sx=30+(styleSeed*200+s*61)%560, sy=30+(s*37+styleSeed*80)%160;
+      ctx.fillStyle=`rgba(${80+s*3},8,10,${.25+((s*styleSeed)%1)*.4})`;
+      ctx.beginPath();ctx.ellipse(sx,sy,2+s%4,1.5+s%3,s*.4,0,Math.PI*2);ctx.fill();
+    }
+  }
   const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
-  // Sprite yerine duvara sabit düzlem kullan: yazı kameraya dönmez ve oyuncuyu takip etmez.
   const material=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,side:THREE.DoubleSide});
-  const writing=new THREE.Mesh(new THREE.PlaneGeometry(4.2,1.05),material);
+  const writing=new THREE.Mesh(new THREE.PlaneGeometry(4.6,1.7),material);
   return writing;
+}
+function makeBackBoneProp(seed){
+  const g=new THREE.Group();
+  const boneMat=new THREE.MeshLambertMaterial({color:0xd9d0b8});
+  const darkMat=new THREE.MeshLambertMaterial({color:0xb7aa8e});
+  // Basit kemik: iki uç + gövde
+  const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.035,.04,.42,6),boneMat);
+  shaft.rotation.z=Math.PI/2+((seed%1)-.5)*.35;shaft.position.y=.05;g.add(shaft);
+  for(const side of [-1,1]){
+    const knob=new THREE.Mesh(new THREE.SphereGeometry(.055,6,5),darkMat);
+    knob.position.set(side*.2,.05,0);g.add(knob);
+  }
+  // Kan lekesi
+  if(seed>.4){
+    const stain=new THREE.Mesh(new THREE.CircleGeometry(.16+seed*.1,8),new THREE.MeshBasicMaterial({color:0x4a0c0e,transparent:true,opacity:.55}));
+    stain.rotation.x=-Math.PI/2;stain.position.y=.01;g.add(stain);
+  }
+  return g;
+}
+function makeBloodStain(seed){
+  const canvas=document.createElement('canvas');canvas.width=128;canvas.height=128;
+  const ctx=canvas.getContext('2d');
+  for(let i=0;i<7;i++){
+    const a=.2+((seed*i)%1)*.35;
+    ctx.fillStyle=`rgba(${70+i*5},5,8,${a})`;
+    ctx.beginPath();
+    ctx.ellipse(64+Math.sin(i+seed)*28,64+Math.cos(i*1.3)*22,10+i*3,7+i*2,i*.5,0,Math.PI*2);
+    ctx.fill();
+  }
+  const tex=new THREE.CanvasTexture(canvas);
+  const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,opacity:.85});
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(.9+seed*.5,.7+seed*.35),mat);
+  mesh.rotation.x=-Math.PI/2;mesh.position.y=.02;
+  return mesh;
 }
 const backroomsChunks=new Map();
 const BACK_CELL=8, BACK_CHUNK_CELLS=4, BACK_CHUNK_SIZE=BACK_CELL*BACK_CHUNK_CELLS;
@@ -2087,11 +2172,35 @@ function buildBackroomsChunk(cx,cz){
       wall.position.set(e.px,wallH/2,e.pz);group.add(wall);
       colliders.push({x:cx*BACK_CHUNK_SIZE+e.px,z:cz*BACK_CHUNK_SIZE+e.pz,hx:e.hx+.18,hz:e.hz+.18});
       // Grafitiler yalnızca seyrek duvarlarda, koridor boyunca aralıklı görünür.
-      if(backHash(gx,gz,91+ei)>.76){
+      if(backHash(gx,gz,91+ei)>.74){
         const idx=Math.floor(backHash(gx,gz,137+ei)*backGraffitiTexts.length);
-        const graffiti=makeBackGraffiti(backGraffitiTexts[idx]);
-        graffiti.position.set(e.px+(horizontal?0:(ei===0?-.2:.2)),2.05,e.pz+(horizontal?(ei===2?-.2:.2):0));
+        const styleSeed=backHash(gx,gz,211+ei);
+        const graffiti=makeBackGraffiti(backGraffitiTexts[idx],styleSeed);
+        graffiti.position.set(e.px+(horizontal?0:(ei===0?-.22:.22)),2.05,e.pz+(horizontal?(ei===2?-.22:.22):0));
         graffiti.rotation.y=horizontal?0:Math.PI/2;group.add(graffiti);
+        // Bazı yazıların dibinde kan ve kemik kalıntıları.
+        if(styleSeed>.48){
+          const stain=makeBloodStain(styleSeed);
+          stain.position.set(e.px+(horizontal?((styleSeed-.5)*1.2):0),.02,e.pz+(horizontal?0:((styleSeed-.5)*1.2)));
+          group.add(stain);
+        }
+        if(styleSeed>.62){
+          const bone=makeBackBoneProp(styleSeed);
+          bone.position.set(e.px+(horizontal?(-.6+styleSeed*.9):(ei===0?-.35:.35)),0,e.pz+(horizontal?(ei===2?-.35:.35):(-.4+styleSeed*.7)));
+          bone.rotation.y=styleSeed*6.2;group.add(bone);
+        }
+      }
+      // Duvar diplerinde ara sıra ekstra kan/kemik (yazı olmasa da).
+      if(backHash(gx,gz,401+ei)>.88){
+        const seed=backHash(gx,gz,503+ei);
+        const stain=makeBloodStain(seed);
+        stain.position.set(e.px+((seed-.5)*.8),.02,e.pz+((seed-.5)*.8));
+        group.add(stain);
+        if(seed>.55){
+          const bone=makeBackBoneProp(seed);
+          bone.position.set(e.px+((seed-.5)*1.1),0,e.pz+((seed-.5)*1.1));
+          bone.rotation.y=seed*4.1;group.add(bone);
+        }
       }
     }
   }
@@ -2759,28 +2868,28 @@ function collides(x,z){
 }
 
 function spawnAlmondWaters(){
-  if(almondWaterSpawned||!guideFinished||almondWaterCount>=6)return;
+  if(almondWaterSpawned||!guideFinished||almondWaterCount>=10)return;
   almondWaterSpawned=true;
   almondWaterGroup=new THREE.Group();backroomsScene.add(almondWaterGroup);
   const loader=new THREE.TextureLoader();
   const commonTexture=loader.load('./object/water2.png');
   const rareTexture=loader.load('./object/water.png');
   const spots=[];
-  // Kuş uçuşu uzak, birbirinden ayrılmış ve oyuncudan da uzakta noktalar seç.
-  for(let i=0;i<6;i++){
+  // Daha sık bulunur: daha yakın, daha fazla ve daha kısa aralıklı noktalar.
+  for(let i=0;i<10;i++){
     let chosen=null;
-    for(let attempt=0;attempt<100;attempt++){
+    for(let attempt=0;attempt<120;attempt++){
       const angle=Math.random()*Math.PI*2;
-      const distance=28+Math.random()*72;
+      const distance=14+Math.random()*48;
       const x=player.x+Math.cos(angle)*distance, z=player.z+Math.sin(angle)*distance;
-      if(Math.hypot(x-player.x,z-player.z)<26)continue;
-      if(spots.some(q=>Math.hypot(x-q.x,z-q.z)<24))continue;
+      if(Math.hypot(x-player.x,z-player.z)<12)continue;
+      if(spots.some(q=>Math.hypot(x-q.x,z-q.z)<14))continue;
       if(backroomsColliders.some(c=>Math.abs(x-c.x)<c.hx+1.5&&Math.abs(z-c.z)<c.hz+1.5))continue;
       chosen={x,z};break;
     }
     if(!chosen)continue;
     spots.push(chosen);
-    const isRare=Math.random()<0.07;
+    const isRare=Math.random()<0.12;
     const material=new THREE.SpriteMaterial({map:isRare?rareTexture:commonTexture,transparent:true,depthWrite:false});
     const sprite=new THREE.Sprite(material);sprite.position.set(chosen.x,.72,chosen.z);sprite.scale.set(.62,.9,1);
     sprite.userData={collected:false,rare:isRare};almondWaterGroup.add(sprite);almondWaterItems.push(sprite);
@@ -2848,29 +2957,137 @@ function luciPlaceAtDistance(distance,side=1){
   ghost.position.set(luciTarget.x,1.42,luciTarget.z);ghost.lookAt(player.x,1.4,player.z);
   ghost.visible=false;
 }
-const luciTaunts=[
-  'Korkuyor musun?',
-  'Aradığın şeyi biliyorum...',
-  'Sana acıyorum. Seni denek olarak seçmişler.',
-  'Sana yazık oldu...',
-  'Burada bir şey arıyorsun, değil mi?',
-  'Çıkışı mı arıyorsun, yoksa kendini mi?',
-  'Deney için biçilmiş kaftansın.',
-  'Kimse seni kurtarmaya gelmeyecek.',
-  'Seni izliyorum... her adımını.',
-  'O sesi duyunca koşma. Zaten geç kalmışsın.',
-  'Kendi benliğini unutursan bana kalırsın.',
-  'Yazık... bir denekten başka bir şey değilsin.'
+// Canavar-oyuncu atışmaları. who: 'luci' | 'player'. revealName: ismini açıklar.
+const luciExchanges=[
+  [
+    {who:'luci',text:'Korkuyor musun, denek?'},
+    {who:'player',text:'Ben denek değilim. Sen de kimsin?'},
+    {who:'luci',text:'Öncekiler de aynı şeyi söylemişti. Hepiniz aynıydınız.'},
+    {who:'player',text:'Ne öncekileri? Ne saçmalıyorsun?'},
+    {who:'luci',text:'Sizi kullandılar. Deney için biçilmiş kaftansınız.'}
+  ],
+  [
+    {who:'player',text:'Orada birisi mi var? Konuş!'},
+    {who:'luci',text:'Konuşuyorum. Sen duymuyorsun sadece.'},
+    {who:'player',text:'Ne aradığımı biliyorsan söyle.'},
+    {who:'luci',text:'Aradığın şeyi bulamayacaksın. Safça umut ediyorsun.'},
+    {who:'player',text:'Sus. Çıkışı bulacağım.'},
+    {who:'luci',text:'Çıkış yok. Sadece bir sonraki denek var.'}
+  ],
+  [
+    {who:'luci',text:'Sana acıyorum. Seni denek olarak seçmişler.'},
+    {who:'player',text:'Kim seçmiş? Adını söyle!'},
+    {who:'luci',text:'Adım Luci. Unutma... uzun süre hatırlayacaksın.',revealName:true},
+    {who:'player',text:'Luci mi? Ne istiyorsun benden?'},
+    {who:'luci',text:'İstemiyorum. Sadece izliyorum. Öncekiler gibi çökmeni.'}
+  ],
+  [
+    {who:'luci',text:'Sana yazık oldu... gerçekten.'},
+    {who:'player',text:'Acımanı istemiyorum. Defol!'},
+    {who:'luci',text:'Önceki denek de bağırıyordu. Sonra sustu.'},
+    {who:'player',text:'Ben onlar gibi değilim.'},
+    {who:'luci',text:'Hepiniz öyle sanıyorsunuz. Sonra unutuyorsunuz kim olduğunuzu.'}
+  ],
+  [
+    {who:'player',text:'Aradığım şeyi biliyorsun, değil mi?'},
+    {who:'luci',text:'Biliyorum. Ama sen bulamayacaksın.'},
+    {who:'player',text:'Neden? Ne saklıyorsun?'},
+    {who:'luci',text:'Saklamıyorum. Siz zaten kaybettiniz. Deney bitti sandınız.'},
+    {who:'player',text:'Bu bir rüya... uyanacağım.'},
+    {who:'luci',text:'Rüya diye tutunduğun şey, senin kafesin.'}
+  ],
+  [
+    {who:'luci',text:'Seni izliyorum... her adımını.'},
+    {who:'player',text:'O zaman çık karşıma!'},
+    {who:'luci',text:'Görünmek zorunda değilim. Işıkların titremesi yeter.'},
+    {who:'player',text:'Korkutmuyorsun beni.'},
+    {who:'luci',text:'Korkmuyorsun çünkü henüz anlamadın. Anlayınca geç olacak.'}
+  ],
+  [
+    {who:'player',text:'Önceki deneklere ne yaptınız?'},
+    {who:'luci',text:'Biz mi? Hayır... onlar kendi kendilerini bitirdi.'},
+    {who:'player',text:'Yalan söylüyorsun.'},
+    {who:'luci',text:'İnanman önemli değil. Unutman önemli. Unutursan bana kalırsın.'},
+    {who:'player',text:'Benliğimi unutmam. Asla.'},
+    {who:'luci',text:'Asla diyenler ilk unutanlardı.'}
+  ],
+  [
+    {who:'luci',text:'Safsın. Gerçekten safsın.'},
+    {who:'player',text:'Seninle dalga geçme.'},
+    {who:'luci',text:'Dalga geçmiyorum. Seni buraya atanlar dalga geçti.'},
+    {who:'player',text:'Kim? Kim attı beni buraya?'},
+    {who:'luci',text:'Cevabı arıyorsun ya... işte o cevabı asla bulamayacaksın.'}
+  ],
+  [
+    {who:'player',text:'Neden ışıklar gidip geliyor?'},
+    {who:'luci',text:'Çünkü yakınımdayım. Hâlâ anlamadın mı?'},
+    {who:'player',text:'O zaman adını söyle, korkak.'},
+    {who:'luci',text:'Luci. İşte adım. Şimdi daha mı cesursun?',revealName:true},
+    {who:'player',text:'Luci... seni bitireceğim.'},
+    {who:'luci',text:'Öncekiler de öyle demişti. Kemikleri hâlâ koridorlarda.'}
+  ],
+  [
+    {who:'luci',text:'Kimse seni kurtarmaya gelmeyecek.'},
+    {who:'player',text:'Kimsenin gelmesine gerek yok. Kendim çıkarım.'},
+    {who:'luci',text:'Cesur konuşuyorsun. Tıpkı diğer denekler gibi.'},
+    {who:'player',text:'Beni onlarla bir tutma!'},
+    {who:'luci',text:'Bir tutmuyorum. Aynı yerde çürüyeceksiniz, o kadar.'}
+  ]
 ];
-let luciTauntBag=[];
-function nextLuciTaunt(){
-  if(!luciTauntBag.length){
-    luciTauntBag=luciTaunts.map((_,i)=>i);
-    for(let i=luciTauntBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[luciTauntBag[i],luciTauntBag[j]]=[luciTauntBag[j],luciTauntBag[i]];}
-  }
-  return luciTaunts[luciTauntBag.pop()];
+let luciExchangeBag=[];
+let luciNameRevealed=false;
+let luciExchangeActive=false;
+let luciExchangeQueue=[];
+let luciExchangeTimer=0;
+let luciPresenceActive=false,luciPresenceTime=0,luciTalkCooldown=3.5;
+function luciSpeakerLabel(){
+  return luciNameRevealed?'LUCİ':'BELİRSİZ';
 }
-let luciPresenceActive=false,luciPresenceTime=0,luciTalkCooldown=6;
+function showSpokenLine(speaker,message,typingSpeed=26){
+  if(speaker){
+    speakerName.textContent=speaker;
+    speakerName.classList.add('visible');
+  }else{
+    speakerName.classList.remove('visible');
+  }
+  showSubtitle(message,typingSpeed);
+  const duration=Math.max(4200,message.length*typingSpeed+2600);
+  clearTimeout(showSpokenLine.hideSpeakerTimer);
+  showSpokenLine.hideSpeakerTimer=setTimeout(()=>{
+    // Altyazı kapanınca isim de kaybolur (açılış diyaloğu kendi yönetir).
+    if(!petIntroStarted||!movementLocked)speakerName.classList.remove('visible');
+  },duration);
+  return duration/1000;
+}
+function startLuciExchange(){
+  if(luciExchangeActive||stalkerDialogueActive)return;
+  if(!luciExchangeBag.length){
+    luciExchangeBag=luciExchanges.map((_,i)=>i);
+    for(let i=luciExchangeBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[luciExchangeBag[i],luciExchangeBag[j]]=[luciExchangeBag[j],luciExchangeBag[i]];}
+  }
+  const exchange=luciExchanges[luciExchangeBag.pop()];
+  luciExchangeQueue=exchange.map(l=>({...l}));
+  luciExchangeActive=true;
+  luciExchangeTimer=0.15; // hemen başlasın
+}
+function updateLuciExchange(dt){
+  if(!luciExchangeActive)return;
+  if(stalkerDialogueActive){luciExchangeActive=false;luciExchangeQueue=[];return;}
+  luciExchangeTimer-=dt;
+  if(luciExchangeTimer>0)return;
+  if(!luciExchangeQueue.length){
+    luciExchangeActive=false;
+    luciTalkCooldown=3.2+Math.random()*2.8;
+    return;
+  }
+  const next=luciExchangeQueue.shift();
+  if(next.revealName)luciNameRevealed=true;
+  const speaker=next.who==='player'?'BEN':luciSpeakerLabel();
+  const speed=next.who==='luci'?20:26;
+  const hold=showSpokenLine(speaker,next.text,speed);
+  // Konuşma bittikten 1 sn sonra karşı taraf cevap verir.
+  luciExchangeTimer=hold+1.0;
+}
 let luciPulseQueue=0,luciPulseTimer=0,luciPulsePhase=0;
 function getNearbyBackroomsLights(radius=14){
   const result=[];
@@ -2977,13 +3194,14 @@ function updateLuciGhost(dt){
   luciPhase+=dt*(1+fear*2.2);
   updateLuciWatchPulse(dt);
 
+  updateLuciExchange(dt);
+
   if(luciPresenceActive){
     luciPresenceTime-=dt;
-    // Görünmeden konuşur; altyazı boşken ve rehber diyaloğu yokken.
-    if(luciTalkCooldown<=0&&!stalkerDialogueActive&&!subtitle.classList.contains('visible')&&!drinkAnimating){
-      const line=nextLuciTaunt();
-      if(line)showSubtitle(line);
-      luciTalkCooldown=7.5+Math.random()*5.5;
+    // Daha sık atışma: görünmeden diyalog başlat.
+    if(luciTalkCooldown<=0&&!luciExchangeActive&&!stalkerDialogueActive&&!subtitle.classList.contains('visible')&&!drinkAnimating){
+      startLuciExchange();
+      luciTalkCooldown=2.5+Math.random()*2.2;
     }
     // Yüksek alarmdayken görünmeden saldırır.
     if(backroomsAlert>=90&&luciAttackCooldown<=0){
@@ -2994,20 +3212,28 @@ function updateLuciGhost(dt){
     if(luciPresenceTime<=0){
       luciPresenceActive=false;
       restoreNearbyBackroomsLights();
-      luciTeleportCooldown=Math.max(2.2,5.2-fear*2.4);
+      luciTeleportCooldown=Math.max(1.6,3.8-fear*2.0);
     }
     return;
   }
 
+  // Presence dışında da ara sıra diyalog (canavar uzaktan konuşur).
+  if(luciTalkCooldown<=0&&!luciExchangeActive&&!stalkerDialogueActive&&!subtitle.classList.contains('visible')&&!drinkAnimating){
+    if(Math.random()<dt*0.08){
+      startLuciExchange();
+      luciTalkCooldown=5+Math.random()*4;
+    }
+  }
+
   // Presence başlat: canavar yaklaşır, ışıklar gider gelir, konuşur; model görünmez.
   if(luciTeleportCooldown<=0){
-    const interval=6.4-fear*3.6;
-    if(Math.random()<dt/Math.max(1.1,interval)){
+    const interval=5.2-fear*3.0;
+    if(Math.random()<dt/Math.max(1.0,interval)){
       luciPlaceAtDistance(6.5-fear*2.4,Math.random()<.5?-1:1);
       luciPresenceActive=true;
-      luciPresenceTime=3.2+Math.random()*3.4+fear*1.6;
+      luciPresenceTime=5.5+Math.random()*4.5+fear*2.0;
       startLuciWatchPulse(3+Math.floor(Math.random()*3));
-      if(luciTalkCooldown<=1.2)luciTalkCooldown=.4+Math.random()*.8;
+      if(luciTalkCooldown<=1.2)luciTalkCooldown=.2+Math.random()*.5;
     }
   }
 }
@@ -3037,7 +3263,7 @@ function updateBackroomsItems(dt){
   for(const item of almondWaterItems){
     if(item.userData.collected)continue;
     item.material.rotation+=dt*.12;
-    if(almondWaterCount<6&&Math.hypot(player.x-item.position.x,player.z-item.position.z)<1.05){
+    if(almondWaterCount<10&&Math.hypot(player.x-item.position.x,player.z-item.position.z)<1.05){
       item.userData.collected=true;item.visible=false;almondWaterCount++;
       document.getElementById('waterCountHud').textContent=String(almondWaterCount);
       showSubtitle(item.userData.rare?'Nadir enerji içeceği buldun.':'Enerji içeceği buldun.');
@@ -3047,7 +3273,7 @@ function updateBackroomsItems(dt){
 
 function enterBackrooms(){
   forestActive=false;backroomsActive=true;collapseStarted=false;collapseTime=0;movementLocked=false;
-  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;luciRevealTime=0;luciTeleportCooldown=2;luciAttackCooldown=0;luciScareCooldown=0;luciCollapsing=false;luciCollapseTime=0;luciPresenceActive=false;luciPresenceTime=0;luciTalkCooldown=5;luciPulseQueue=0;luciPulseTimer=0;luciPulsePhase=0;luciTauntBag=[];if(luciGhost)luciGhost.visible=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
+  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;luciRevealTime=0;luciTeleportCooldown=2;luciAttackCooldown=0;luciScareCooldown=0;luciCollapsing=false;luciCollapseTime=0;luciPresenceActive=false;luciPresenceTime=0;luciTalkCooldown=3.5;luciPulseQueue=0;luciPulseTimer=0;luciPulsePhase=0;luciNameRevealed=false;luciExchangeActive=false;luciExchangeQueue=[];luciExchangeTimer=0;luciExchangeBag=[];if(luciGhost)luciGhost.visible=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
   if(backroomsGuide)backroomsGuide.visible=false;
   startBackroomsAmbience();
   startBackroomsCreaks();
