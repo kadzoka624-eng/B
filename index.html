@@ -1634,19 +1634,7 @@ function updateMushroomEffect(dt){
 
 function updateComputerAutoDialogue(dt){
   if(!started||sleeping||sleepAnimation||waking)return;
-  if(!computerAutoDialogueStarted&&nearComputer()){
-    computerAutoDialogueStarted=true;
-    computerAutoDialogueTimer=1.0;
-    showSubtitle('Oyun yapmaktan ne anlıyorlar, anlamıyorum.');
-    return;
-  }
-  if(computerAutoDialogueStarted&&computerAutoDialogueTimer>0){
-    computerAutoDialogueTimer=Math.max(0,computerAutoDialogueTimer-dt);
-    if(computerAutoDialogueTimer===0){
-      showSubtitle('Bari rüyamda sal... Rüyamı oyun oynayarak geçirmeyeceğim. Aradığımız şeyi bulalım.');
-    }
-  }
-  // Mantarın etkisi bitip minik insanlar kaybolunca replik kendi kendine söylenir.
+  // Minik insanlar kaybolunca bu replik otomatik tetiklenir.
   if(mushroomUsed&&mushroomEffectTime===0&&!postTinyPeopleDialogueShown){
     postTinyPeopleDialogueShown=true;
     showSubtitle('Dostum... Instagramı azaltmalıyım...');
@@ -1663,8 +1651,7 @@ async function enterFullscreenFromInteraction(){
     if(request){try{const result=request.call(target);if(result&&result.catch)await result.catch(()=>{});}catch(_){}}
   }
 }
-let computerAutoDialogueStarted=false;
-let computerAutoDialogueTimer=0;
+let computerInteractCount=0;
 let postTinyPeopleDialogueShown=false;
 let postTinyPeopleDialoguePending=false;
 
@@ -1705,7 +1692,15 @@ function interact(){
     }
   }
   else if(nearComputer()){
-    // Bilgisayar diyalogları karakter bilgisayara yaklaşınca otomatik tetiklenir.
+    // Bilgisayar replikleri önceki gibi E tuşuyla sırayla tetiklenir.
+    computerInteractCount++;
+    if(computerInteractCount===1){
+      showSubtitle('Oyun yapmaktan ne anlıyorlar, anlamıyorum.');
+    }else if(computerInteractCount===2){
+      showSubtitle('Bari rüyamda sal... Rüyamı oyun oynayarak geçirmeyeceğim. Aradığımız şeyi bulalım.');
+    }else{
+      showSubtitle('Rüyamda bile ekran başındayım...');
+    }
     hint.textContent='MASADAKİ BİLGİSAYARA BAKIYORSUN.';
   }
   else if(nearBookshelf()){
