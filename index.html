@@ -2802,10 +2802,11 @@ function enterForest(){
   forestFlashlight.intensity=0;
   flashlightFill.intensity=0;
   flashlightRig.visible=false;
-  flashlightBtn.style.display='none';
+  flashlightBtn.style.display='block';
   flashlightBtn.classList.remove('on');
   flashlightBtn.setAttribute('aria-label','El fenerini aç');
   flashlightBtn.title='Feneri aç';
+  // Uyanma animasyonu updateSleep içinde biter; güvenlik için kilit uyanmaya bırakılır.
   showSubtitle('Dostum ilk rüyadan kabus mu geldi..');
 }
 // ELDE TUTULAN FENER: ışık kaynağı ve görünen model kameraya bağlıdır.
@@ -3902,12 +3903,15 @@ function updateSleep(dt){
     if(animationTime>=1.8){
       waking=false;
       movementLocked=false;
+      sleepAnimation=false;
+      sleeping=false;
 
       player.y=1.65;
       player.pitch=0;
 
-      hint.textContent='WASD: İLERLE · SHIFT: KOŞ · C / CTRL: EĞİL · F: FENER';
-      document.getElementById('flashlightBtn').style.display='block';
+      hint.textContent='WASD: İLERLE · SHIFT: KOŞ · C / CTRL: EĞİL · F: FENER · Q: ZOOM';
+      const fb=document.getElementById('flashlightBtn');
+      if(fb){fb.style.display='block';}
 
       camera.position.set(player.x,player.y,player.z);
       camera.rotation.set(0,player.yaw,0,'YXZ');
@@ -3948,10 +3952,12 @@ function animate(){
     }
 
     updateMovement(dt);
+    // Uyku → orman geçişinde uyanma animasyonu ORMANDA biter; bu yüzden her sahnede çalışmalı.
+    if(sleepAnimation||sleeping||waking) updateSleep(dt);
+    if(scareActive) updateScare(dt);
+
     if(!forestActive&&!backroomsActive){
       updateBedroomStayDialogue(dt);
-      updateSleep(dt);
-      updateScare(dt);
       updatePot(dt);
       updatePlantJump(dt);
       updatePotHint();
