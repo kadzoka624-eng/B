@@ -7,7 +7,7 @@
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#171719;color:#eee;font-family:monospace;touch-action:none}
-#game{position:fixed;inset:0}
+#game{position:fixed;inset:0;width:100%;height:100%;overflow:hidden}#game canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
 @keyframes entityScreenShake{
   0%,100%{transform:translate(0,0)}
   10%{transform:translate(-7px,3px)}
@@ -199,8 +199,18 @@ let zoomEnabled=false;
 const normalCameraFov=78, zoomCameraFov=34;
 camera.rotation.order='YXZ';
 
-function mat(color){
-  return new THREE.MeshLambertMaterial({color,flatShading:true});
+function mat(color,props){
+  // İkinci argüman güvenli birleştirilir; bilinmeyen alanlar Three'yi bozmaz.
+  const params=Object.assign({color,flatShading:true},props&&typeof props==='object'?props:null);
+  // MeshLambertMaterial emissive destekler; metalness/roughness yok sayılır (kasıtlı).
+  if('metalness' in params)delete params.metalness;
+  if('roughness' in params)delete params.roughness;
+  try{
+    return new THREE.MeshLambertMaterial(params);
+  }catch(err){
+    console.warn('mat() yedek malzeme:',err);
+    return new THREE.MeshLambertMaterial({color:typeof color==='number'?color:0x888888,flatShading:true});
+  }
 }
 
 const M={
@@ -1516,28 +1526,42 @@ async function playPetIntro(){
   petIntroStarted=true;
   movementLocked=true;
   petEntity.visible=true;
+  // Oyuncu varlıkla sorgular; her satır sohbet balonunda isimle görünür.
   const lines=[
-    ['VARLIK SİLÜETİ','hoşgeldiniz!!'],
-    ['VARLIK SİLÜETİ','deneylerimize katıldığınız için tebrik ederim!!'],
-    ['VARLIK SİLÜETİ','size birşey olması durumunda... aileniz bize emanet!! içiniz rahat olabilir!'],
-    ['VARLIK SİLÜETİ','Sen ciddi misin, beni kedi olarak mı hayal ediyorsun!']
+    ['VARLIK','hoşgeldiniz!!'],
+    ['BEN','Ben neden buradayım? Burası neresi?'],
+    ['VARLIK','deneylerimize katıldığınız için tebrik ederim!!'],
+    ['BEN','Deney mi? Ben hiçbir şeye katılmadım! Ne deneyı?'],
+    ['VARLIK','size birşey olması durumunda... aileniz bize emanet!! içiniz rahat olabilir!'],
+    ['BEN','Ailem mi? Ne saçmalıyorsun? Beni hemen bırak!'],
+    ['VARLIK','Sen ciddi misin, beni kedi olarak mı hayal ediyorsun!'],
+    ['BEN','Sen de kimsin? Neden odamdasın?!']
   ];
   for(let i=0;i<lines.length;i++){
     const [speaker,message]=lines[i];
-    speakerName.textContent=speaker;
-    speakerName.classList.add('visible');
-    showSubtitle(message);
-    // Varlık son cümlesini bağırırken kamera/ekran sertçe sarsılır.
-    if(i===lines.length-1)shakeIntroScreen();
-    // Harf animasyonu ve okuma süresi tamamlandıktan sonra sonraki repliğe geç.
-    await waitIntro(Math.max(4500,message.length*42+2200)+1200);
+    // showSpokenLine isim + balon; yoksa yedek
+    if(typeof showSpokenLine==='function'){
+      showSpokenLine(speaker,message,speaker==='BEN'?26:22);
+    }else{
+      speakerName.textContent=speaker;
+      speakerName.classList.add('visible');
+      if(speaker==='BEN')speakerName.classList.add('speaker-red');
+      else speakerName.classList.remove('speaker-red');
+      showSubtitle(message,speaker==='BEN'?26:22);
+    }
+    // Varlık son bağırışında ekran sarsılır.
+    if(i===6)shakeIntroScreen();
+    await waitIntro(Math.max(4200,message.length*40+2000)+1000);
   }
-  speakerName.classList.remove('visible');
+  speakerName.classList.remove('visible','speaker-red','speaker-guide');
   subtitle.classList.remove('visible');
   petEntity.visible=false;
-  // Varlık tamamen kaybolduktan kısa süre sonra karakter kendi kendine konuşur.
   await waitIntro(900);
-  showSubtitle('Burası benim odam... ama yeni eşyalar gelmiş..');
+  if(typeof showSpokenLine==='function'){
+    showSpokenLine('BEN','Burası benim odam... ama yeni eşyalar gelmiş..',26);
+  }else{
+    showSubtitle('Burası benim odam... ama yeni eşyalar gelmiş..');
+  }
   movementLocked=false;
   bedroomStayTimer=0;
   bedroomStayTracking=true;
@@ -2225,7 +2249,16 @@ function updateBackroomsChunks(){
   const cx=Math.floor(player.x/BACK_CHUNK_SIZE),cz=Math.floor(player.z/BACK_CHUNK_SIZE),keep=new Set();
   for(let x=cx-2;x<=cx+2;x++)for(let z=cz-2;z<=cz+2;z++){const key=`${x},${z}`;keep.add(key);buildBackroomsChunk(x,z);}
   for(const [key,data] of backroomsChunks){if(keep.has(key))continue;
-    backroomsScene.remove(data.group);data.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});
+    try{
+      backroomsScene.remove(data.group);
+      data.group.traverse(o=>{
+        if(o.geometry){try{o.geometry.dispose();}catch(_){}}
+        if(o.material){
+          const mats=Array.isArray(o.material)?o.material:[o.material];
+          for(const m of mats){try{if(m.map)m.map.dispose();m.dispose();}catch(_){}}
+        }
+      });
+    }catch(err){console.warn('Backrooms chunk temizleme:',err);}
     backroomsChunks.delete(key);
   }
   backroomsColliders.length=0;for(const data of backroomsChunks.values())backroomsColliders.push(...data.colliders);
@@ -3293,15 +3326,26 @@ function showSpokenLine(speaker,message,typingSpeed=26){
       speakerName.classList.add('speaker-red');
     }else if(speaker==='RUHANİ REHBER'){
       speakerName.classList.add('speaker-guide');
+    }else if(speaker==='VARLIK'||speaker==='VARLIK SİLÜETİ'){
+      speakerName.style.color='#c9b896';
+    }else{
+      speakerName.style.color='';
+    }
+    if(speaker==='LUCİ'||speaker==='BEN'||speaker==='BELİRSİZ'||speaker==='RUHANİ REHBER'){
+      speakerName.style.color=''; // class rengini kullan
     }
   }else{
     speakerName.classList.remove('visible','speaker-red','speaker-guide');
+    speakerName.style.color='';
   }
   showSubtitle(message,typingSpeed);
   const duration=Math.max(4200,message.length*typingSpeed+2600);
   clearTimeout(showSpokenLine.hideSpeakerTimer);
   showSpokenLine.hideSpeakerTimer=setTimeout(()=>{
-    if(!petIntroStarted||!movementLocked)speakerName.classList.remove('visible');
+    // Intro sırasında isim satırları arasında da yönetilir; kilitliyken zorla silme.
+    if(!(petIntroStarted&&movementLocked&&!forestActive&&!backroomsActive)){
+      speakerName.classList.remove('visible');
+    }
   },duration);
   return duration/1000;
 }
@@ -3803,33 +3847,49 @@ const clock=new THREE.Clock();
 
 function animate(){
   requestAnimationFrame(animate);
+  try{
+    const dt=Math.min(clock.getDelta(),.05);
+    elapsed+=dt;
+    const targetFov=zoomEnabled?zoomCameraFov:normalCameraFov;
+    const nextFov=THREE.MathUtils.damp(camera.fov,targetFov,9,dt);
+    if(Math.abs(camera.fov-nextFov)>.001){camera.fov=nextFov;camera.updateProjectionMatrix();}
 
-  const dt=Math.min(clock.getDelta(),.05);
-  elapsed+=dt;
-  const targetFov=zoomEnabled?zoomCameraFov:normalCameraFov;
-  const nextFov=THREE.MathUtils.damp(camera.fov,targetFov,9,dt);
-  if(Math.abs(camera.fov-nextFov)>.001){camera.fov=nextFov;camera.updateProjectionMatrix();}
+    updateMovement(dt);
+    updateBedroomStayDialogue(dt);
+    updateBackroomsEncounter(dt);
+    updateBackroomsItems(dt);
+    updateLuciCollapse(dt);
+    updateLuciGhost(dt);
+    updateSurvivalHud(dt);
+    updateMentalState(dt);
+    updateSleep(dt);
+    updateScare(dt);
+    updatePot(dt);
+    updatePlantJump(dt);
+    updatePotHint();
+    updateFlashlightAnimation(dt);
+    updateForestSilhouettes(dt);
+    updateStalkerEffects(dt);
+    updateMushroomEffect(dt);
+    updateComputerAutoDialogue(dt);
 
-  updateMovement(dt);
-  updateBedroomStayDialogue(dt);
-  updateBackroomsEncounter(dt);
-  updateBackroomsItems(dt);
-  updateLuciCollapse(dt);
-  updateLuciGhost(dt);
-  updateSurvivalHud(dt);
-  updateMentalState(dt);
-  updateSleep(dt);
-  updateScare(dt);
-  updatePot(dt);
-  updatePlantJump(dt);
-  updatePotHint();
-  updateFlashlightAnimation(dt);
-  updateForestSilhouettes(dt);
-  updateStalkerEffects(dt);
-  updateMushroomEffect(dt);
-  updateComputerAutoDialogue(dt);
-
-  renderer.render(backroomsActive?backroomsScene:(forestActive?forestScene:scene),camera);
+    // Kamerayı aktif sahneye bağla: eldeki fener/içecek modelleri görünsün,
+    // sahne değişiminde boş/beyaz kare oluşmasın.
+    const activeScene=backroomsActive?backroomsScene:(forestActive?forestScene:scene);
+    if(camera.parent!==activeScene){
+      if(camera.parent)camera.parent.remove(camera);
+      activeScene.add(camera);
+    }
+    // Canvas CSS boyutunu koru (bazı tarayıcılarda stil sıfırlanıp sol üstte küçük kare kalıyordu).
+    if(renderer.domElement.style.width!=='100vw'){
+      renderer.domElement.style.width='100vw';
+      renderer.domElement.style.height='100vh';
+      renderer.domElement.style.display='block';
+    }
+    renderer.render(activeScene,camera);
+  }catch(err){
+    console.error('Oyun döngüsü hatası:',err);
+  }
 }
 
 // TELEFONU SALLAYINCA TAM EKRAN
@@ -3907,6 +3967,9 @@ animate();
 
 window.addEventListener('resize',()=>{
   renderer.setSize(W,H,false);
+  renderer.domElement.style.width='100vw';
+  renderer.domElement.style.height='100vh';
+  renderer.domElement.style.display='block';
   camera.aspect=W/H; camera.updateProjectionMatrix();
 });
 </script>
