@@ -860,7 +860,57 @@ for(let ring=0;ring<3;ring++){
   }
 }
 const flowerCore=new THREE.Mesh(new THREE.IcosahedronGeometry(.105,1),mat(0xb28a48));
+
 flower.add(flowerCore);
+
+// Çiçeğin arkasındaki sol duvara oyun kontrolleri panosu.
+const controlsBoard=group(scene,-3.91,2.12,1.55);
+controlsBoard.rotation.y=Math.PI/2;
+const controlsCanvas=document.createElement('canvas');
+controlsCanvas.width=1024;
+controlsCanvas.height=600;
+const controlsCtx=controlsCanvas.getContext('2d');
+controlsCtx.fillStyle='#171713';
+controlsCtx.fillRect(0,0,1024,600);
+controlsCtx.strokeStyle='#9b896d';
+controlsCtx.lineWidth=12;
+controlsCtx.strokeRect(18,18,988,564);
+controlsCtx.strokeStyle='rgba(190,170,132,.35)';
+controlsCtx.lineWidth=3;
+controlsCtx.strokeRect(34,34,956,532);
+controlsCtx.textAlign='center';
+controlsCtx.fillStyle='#d8c7a7';
+controlsCtx.font='bold 68px monospace';
+controlsCtx.fillText('OYUN KONTROLLERI',512,135);
+controlsCtx.fillStyle='#9b896d';
+controlsCtx.fillRect(110,174,804,3);
+controlsCtx.textAlign='left';
+controlsCtx.font='bold 54px monospace';
+controlsCtx.fillStyle='#e8e0d0';
+controlsCtx.fillText('W A S D',145,280);
+controlsCtx.fillStyle='#b9aa8d';
+controlsCtx.font='42px monospace';
+controlsCtx.fillText('YURU',560,280);
+controlsCtx.fillStyle='#e8e0d0';
+controlsCtx.font='bold 54px monospace';
+controlsCtx.fillText('SHIFT',145,380);
+controlsCtx.fillStyle='#b9aa8d';
+controlsCtx.font='42px monospace';
+controlsCtx.fillText('KOS',560,380);
+controlsCtx.fillStyle='#e8e0d0';
+controlsCtx.font='bold 54px monospace';
+controlsCtx.fillText('C',145,480);
+controlsCtx.fillStyle='#b9aa8d';
+controlsCtx.font='42px monospace';
+controlsCtx.fillText('EGIL',560,480);
+const controlsTexture=new THREE.CanvasTexture(controlsCanvas);
+controlsTexture.colorSpace=THREE.SRGBColorSpace;
+const controlsPanel=new THREE.Mesh(
+  new THREE.PlaneGeometry(1.72,1.02),
+  new THREE.MeshBasicMaterial({map:controlsTexture})
+);
+controlsPanel.position.z=.012;
+controlsBoard.add(controlsPanel);
 for(let i=0;i<6;i++){
   const thorn=new THREE.Mesh(new THREE.ConeGeometry(.035,.16,5),mat(0x293b25));
   const a=i/6*Math.PI*2; thorn.position.set(Math.cos(a)*.19,-.08,Math.sin(a)*.19); thorn.rotation.z=Math.cos(a)*.8; thorn.rotation.x=Math.sin(a)*.8; pot.add(thorn);
