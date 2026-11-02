@@ -2096,13 +2096,15 @@ function buildBackroomsChunk(cx,cz){
     }
   }
   // Floresanların çoğu bozuk; yalnızca yaklaşık beşte biri yanar.
+  const lights=[];
   for(let x=4;x<BACK_CHUNK_SIZE;x+=16)for(let z=4;z<BACK_CHUNK_SIZE;z+=16){
     const gx=cx*BACK_CHUNK_CELLS+Math.floor(x/BACK_CELL),gz=cz*BACK_CHUNK_CELLS+Math.floor(z/BACK_CELL);
     if(backHash(gx,gz,301)<.78)continue;
     const panel=new THREE.Mesh(new THREE.BoxGeometry(2.5,.08,1.2),new THREE.MeshBasicMaterial({color:0xffe6a0}));panel.position.set(x,3.94,z);group.add(panel);
     const light=new THREE.PointLight(0xffe9a0,.22,10);light.position.set(x,3.65,z);group.add(light);
+    lights.push({light,panel,lx:x,lz:z,baseIntensity:.22,baseColor:0xffe6a0});
   }
-  backroomsChunks.set(key,{group,colliders});backroomsColliders.push(...colliders);
+  backroomsChunks.set(key,{group,colliders,lights});backroomsColliders.push(...colliders);
 }
 function updateBackroomsChunks(){
   const cx=Math.floor(player.x/BACK_CHUNK_SIZE),cz=Math.floor(player.z/BACK_CHUNK_SIZE),keep=new Set();
@@ -2830,7 +2832,8 @@ const luciForward=new THREE.Vector3(),luciRight=new THREE.Vector3(),luciTarget=n
 function createLuciGhost(){
   if(luciGhost)return luciGhost;
   const texLoader=new THREE.TextureLoader();
-  luciTexture=texLoader.load('./luci/luci.png',()=>{if(luciGhost)luciGhost.visible=true;},undefined,()=>{if(luciGhost)luciGhost.visible=false;});
+  // 3D hayalet yalnızca yüklensin; normal dolaşmada asla görünmez, sadece jumpscare overlay kullanılır.
+  luciTexture=texLoader.load('./luci/luci.png',()=>{},undefined,()=>{});
   luciTexture.colorSpace=THREE.SRGBColorSpace;
   const mat=new THREE.MeshBasicMaterial({map:luciTexture,transparent:true,alphaTest:.06,side:THREE.DoubleSide,depthWrite:false});
   luciGhost=new THREE.Mesh(new THREE.PlaneGeometry(1.65,2.8),mat);
@@ -2843,39 +2846,168 @@ function luciPlaceAtDistance(distance,side=1){
   const angle=(Math.random()-.5)*.9;
   luciTarget.set(player.x,0,player.z).addScaledVector(luciForward,Math.cos(angle)*distance).addScaledVector(luciRight,Math.sin(angle)*distance*side);
   ghost.position.set(luciTarget.x,1.42,luciTarget.z);ghost.lookAt(player.x,1.4,player.z);
+  ghost.visible=false;
 }
-function updateLuciGhost(dt){
-  if(!backroomsActive||!guideFinished)return;
-  const ghost=createLuciGhost();
-  const fear=THREE.MathUtils.clamp(backroomsSleep/100,0,1);
-  luciTeleportCooldown=Math.max(0,luciTeleportCooldown-dt);
-  luciRevealTime=Math.max(0,luciRevealTime-dt);
-  luciAttackCooldown=Math.max(0,luciAttackCooldown-dt);
-  luciPhase+=dt*(1+fear*2.5);
-  const dx=player.x-ghost.position.x,dz=player.z-ghost.position.z;
-  const distance=Math.hypot(dx,dz);
-  if(luciRevealTime>0){
-    ghost.visible=true;ghost.material.opacity=.72+Math.sin(luciPhase*7)*.18;
-    ghost.position.y=1.42+Math.sin(luciPhase*2)*.07;
-    ghost.lookAt(player.x,1.4,player.z);
-    if(distance<3.2&&luciAttackCooldown<=0){
-      // Alarm göstergesi kırmızı seviyedeyken yakın saldırı yapar.
-      if(backroomsAlert>=90)triggerLuciAttack();
-      luciPlaceAtDistance(8+Math.random()*4,-1);luciRevealTime=.7+Math.random()*.35;
-      luciAttackCooldown=Math.max(1.1,4.8-fear*3.3);luciTeleportCooldown=Math.max(.8,2.8-fear*1.7);
-      ghost.visible=false;
+const luciTaunts=[
+  'Korkuyor musun?',
+  'Aradığın şeyi biliyorum...',
+  'Sana acıyorum. Seni denek olarak seçmişler.',
+  'Sana yazık oldu...',
+  'Burada bir şey arıyorsun, değil mi?',
+  'Çıkışı mı arıyorsun, yoksa kendini mi?',
+  'Deney için biçilmiş kaftansın.',
+  'Kimse seni kurtarmaya gelmeyecek.',
+  'Seni izliyorum... her adımını.',
+  'O sesi duyunca koşma. Zaten geç kalmışsın.',
+  'Kendi benliğini unutursan bana kalırsın.',
+  'Yazık... bir denekten başka bir şey değilsin.'
+];
+let luciTauntBag=[];
+function nextLuciTaunt(){
+  if(!luciTauntBag.length){
+    luciTauntBag=luciTaunts.map((_,i)=>i);
+    for(let i=luciTauntBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[luciTauntBag[i],luciTauntBag[j]]=[luciTauntBag[j],luciTauntBag[i]];}
+  }
+  return luciTaunts[luciTauntBag.pop()];
+}
+let luciPresenceActive=false,luciPresenceTime=0,luciTalkCooldown=6;
+let luciPulseQueue=0,luciPulseTimer=0,luciPulsePhase=0;
+function getNearbyBackroomsLights(radius=14){
+  const result=[];
+  for(const data of backroomsChunks.values()){
+    if(!data.lights)continue;
+    const ox=data.group.position.x, oz=data.group.position.z;
+    for(const entry of data.lights){
+      const wx=ox+entry.lx, wz=oz+entry.lz;
+      if(Math.hypot(wx-player.x,wz-player.z)<=radius)result.push({...entry,wx,wz});
+    }
+  }
+  return result;
+}
+function restoreNearbyBackroomsLights(){
+  for(const data of backroomsChunks.values()){
+    if(!data.lights)continue;
+    for(const entry of data.lights){
+      entry.light.intensity=entry.baseIntensity;
+      if(entry.panel&&entry.panel.material)entry.panel.material.color.setHex(entry.baseColor);
+    }
+  }
+  if(flashlightOn){
+    backroomsFlashlight.intensity=42;
+    backroomsFlashlightFill.intensity=5;
+  }
+}
+function startLuciWatchPulse(count=4){
+  luciPulseQueue=count;
+  luciPulseTimer=0.02;
+  luciPulsePhase=0;
+  if(flashlightOn)playFlashlightSwitchSound();
+}
+function updateLuciWatchPulse(dt){
+  const nearby=getNearbyBackroomsLights(16);
+  if(luciPulseQueue<=0&&luciPulseTimer<=0){
+    // Presence boyunca tavan ışıkları hafif titrer; pulse bitince tam karartma kalkar.
+    if(luciPresenceActive){
+      for(const entry of nearby){
+        const flicker=.55+.45*Math.sin(elapsed*18+entry.wx*.3);
+        entry.light.intensity=entry.baseIntensity*flicker;
+        if(entry.panel&&entry.panel.material){
+          const c=flicker>.7?entry.baseColor:0x5a5230;
+          entry.panel.material.color.setHex(c);
+        }
+      }
+      if(flashlightOn){
+        const f=.72+.28*Math.sin(elapsed*22);
+        backroomsFlashlight.intensity=42*f;
+        backroomsFlashlightFill.intensity=5*f;
+      }
     }
     return;
   }
-  ghost.visible=false;
+  luciPulseTimer-=dt;
+  if(luciPulsePhase===0){
+    // Kapalı faz
+    if(flashlightOn){
+      backroomsFlashlight.intensity=0;
+      backroomsFlashlightFill.intensity=0;
+    }
+    for(const entry of nearby){
+      entry.light.intensity=0;
+      if(entry.panel&&entry.panel.material)entry.panel.material.color.setHex(0x2a2618);
+    }
+    if(luciPulseTimer<=0){
+      luciPulsePhase=1;
+      luciPulseTimer=.07+Math.random()*.05;
+      if(flashlightOn)playFlashlightSwitchSound();
+    }
+  }else{
+    // Açık faz
+    if(flashlightOn){
+      backroomsFlashlight.intensity=42;
+      backroomsFlashlightFill.intensity=5;
+    }
+    for(const entry of nearby){
+      entry.light.intensity=entry.baseIntensity;
+      if(entry.panel&&entry.panel.material)entry.panel.material.color.setHex(entry.baseColor);
+    }
+    if(luciPulseTimer<=0){
+      luciPulseQueue--;
+      if(luciPulseQueue>0){
+        luciPulsePhase=0;
+        luciPulseTimer=.1+Math.random()*.12;
+        if(flashlightOn)playFlashlightSwitchSound();
+      }else{
+        luciPulseTimer=0;
+      }
+    }
+  }
+}
+function updateLuciGhost(dt){
+  if(!backroomsActive||!guideFinished){
+    if(luciGhost)luciGhost.visible=false;
+    return;
+  }
+  const ghost=createLuciGhost();
+  ghost.visible=false; // yalnızca jumpscare overlay görünür
+  const fear=THREE.MathUtils.clamp(backroomsSleep/100,0,1);
+  luciTeleportCooldown=Math.max(0,luciTeleportCooldown-dt);
+  luciRevealTime=0;
+  luciAttackCooldown=Math.max(0,luciAttackCooldown-dt);
+  luciTalkCooldown=Math.max(0,luciTalkCooldown-dt);
+  luciPhase+=dt*(1+fear*2.2);
+  updateLuciWatchPulse(dt);
+
+  if(luciPresenceActive){
+    luciPresenceTime-=dt;
+    // Görünmeden konuşur; altyazı boşken ve rehber diyaloğu yokken.
+    if(luciTalkCooldown<=0&&!stalkerDialogueActive&&!subtitle.classList.contains('visible')&&!drinkAnimating){
+      const line=nextLuciTaunt();
+      if(line)showSubtitle(line);
+      luciTalkCooldown=7.5+Math.random()*5.5;
+    }
+    // Yüksek alarmdayken görünmeden saldırır.
+    if(backroomsAlert>=90&&luciAttackCooldown<=0){
+      triggerLuciAttack();
+      luciAttackCooldown=Math.max(2.2,5.5-fear*2.8);
+      luciPresenceTime=Math.min(luciPresenceTime,.4);
+    }
+    if(luciPresenceTime<=0){
+      luciPresenceActive=false;
+      restoreNearbyBackroomsLights();
+      luciTeleportCooldown=Math.max(2.2,5.2-fear*2.4);
+    }
+    return;
+  }
+
+  // Presence başlat: canavar yaklaşır, ışıklar gider gelir, konuşur; model görünmez.
   if(luciTeleportCooldown<=0){
-    // Uykuyla birlikte daha yakin ve daha sik gorunur.
-    const interval=5.8-fear*4.2;
-    if(Math.random()<dt/Math.max(.8,interval)){
-      luciPlaceAtDistance(7.5-fear*3.2,Math.random()<.5?-1:1);
-      luciRevealTime=Math.max(.45,1.25-fear*.45);
-      luciTeleportCooldown=Math.max(.7,2.6-fear*1.7);
-      ghost.visible=true;
+    const interval=6.4-fear*3.6;
+    if(Math.random()<dt/Math.max(1.1,interval)){
+      luciPlaceAtDistance(6.5-fear*2.4,Math.random()<.5?-1:1);
+      luciPresenceActive=true;
+      luciPresenceTime=3.2+Math.random()*3.4+fear*1.6;
+      startLuciWatchPulse(3+Math.floor(Math.random()*3));
+      if(luciTalkCooldown<=1.2)luciTalkCooldown=.4+Math.random()*.8;
     }
   }
 }
@@ -2915,7 +3047,7 @@ function updateBackroomsItems(dt){
 
 function enterBackrooms(){
   forestActive=false;backroomsActive=true;collapseStarted=false;collapseTime=0;movementLocked=false;
-  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;luciRevealTime=0;luciTeleportCooldown=2;luciAttackCooldown=0;luciScareCooldown=0;luciCollapsing=false;luciCollapseTime=0;if(luciGhost)luciGhost.visible=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
+  backroomsEncounterTime=0;backroomsEncounterStarted=false;backroomsEncounterStep=0;guideFinished=false;backroomsAlert=0;document.getElementById('alertHud').style.display='none';document.getElementById('alertFill').style.width='0%';drinkAnimating=false;drinkAnimationTime=0;backroomsSleep=0;backroomsSleepWarned=false;backroomsSleepCritical=false;luciRevealTime=0;luciTeleportCooldown=2;luciAttackCooldown=0;luciScareCooldown=0;luciCollapsing=false;luciCollapseTime=0;luciPresenceActive=false;luciPresenceTime=0;luciTalkCooldown=5;luciPulseQueue=0;luciPulseTimer=0;luciPulsePhase=0;luciTauntBag=[];if(luciGhost)luciGhost.visible=false;sleepBlinkCooldown=0;sleepBlinkTime=0;blink.style.opacity='0';almondWaterCount=0;almondWaterItems=[];almondWaterSpawned=false;almondWaterSpeedBoost=0;document.getElementById("waterCountHud").textContent="0";document.getElementById("backroomsHud").style.display="none";document.getElementById("waterCounter").style.display="none";document.getElementById("drinkButton").style.display="none";backroomsEncounterStepTime=0;backroomsEncounterWobble=0;
   if(backroomsGuide)backroomsGuide.visible=false;
   startBackroomsAmbience();
   startBackroomsCreaks();
