@@ -896,10 +896,11 @@ const controlRows=[
   ['W A S D','Yürü'],
   ['SHIFT','Koş'],
   ['C','Eğil'],
-  ['Q','Zoom']
+  ['Q','Zoom'],
+  ['L','Tam ekran']
 ];
 controlRows.forEach((row,i)=>{
-  const y=285+i*112;
+  const y=250+i*90;
   controlsCtx.save();
   controlsCtx.translate(340,y);
   controlsCtx.rotate((i%2===0?-.012:.014));
@@ -917,6 +918,13 @@ controlRows.forEach((row,i)=>{
   controlsCtx.fillText(row[1],0,0);
   controlsCtx.restore();
 });
+controlsCtx.save();
+controlsCtx.textAlign='center';
+controlsCtx.fillStyle='#c5b596';
+controlsCtx.font='italic 27px "Segoe Print", "Comic Sans MS", cursive';
+controlsCtx.fillText('Mobil oyuncular kitaplığa dokunarak büyütebilir.',512,690);
+controlsCtx.fillText('Mobilde zoom desteği yoktur.',512,724);
+controlsCtx.restore();
 const controlsTexture=new THREE.CanvasTexture(controlsCanvas);
 controlsTexture.colorSpace=THREE.SRGBColorSpace;
 const controlsPanel=new THREE.Mesh(
@@ -1434,7 +1442,7 @@ function playScream(){
 }
 
 // ALTYAZI
-function showSubtitle(message){
+function showSubtitle(message, typingSpeed=78){
   clearInterval(subtitleTimer);
   subtitle.innerHTML='';
   subtitle.classList.add('visible');
@@ -1457,15 +1465,15 @@ function showSubtitle(message){
 
     if(char!==' '&&char!=='.'&&char!==',')typeSound();
     index++;
-  },78);
+  },typingSpeed);
 
   clearTimeout(showSubtitle.hideTimer);
 
-  // Metin daha yavaş yazılır; altyazı tamamlandıktan sonra da okunabilecek kadar kalır.
+  // Genel replikler varsayılan hızda; özel konuşmacılar kendi hızını verebilir.
   showSubtitle.hideTimer=setTimeout(()=>{
     clearInterval(subtitleTimer);
     subtitle.classList.remove('visible');
-  },Math.max(6000,message.length*78+3200));
+  },Math.max(6000,message.length*typingSpeed+3200));
 }
 
 // Açılış diyaloğu: konuşmacı adı metin kutusunun sol üstünde görünür.
@@ -1652,6 +1660,18 @@ async function enterFullscreenFromInteraction(){
     if(request){try{const result=request.call(target);if(result&&result.catch)await result.catch(()=>{});}catch(_){}}
   }
 }
+async function toggleFullscreenFromKey(){
+  try{
+    if(document.fullscreenElement){
+      const exit=document.exitFullscreen||document.webkitExitFullscreen;
+      if(exit)await exit.call(document);
+    }else{
+      const target=document.documentElement;
+      const request=target.requestFullscreen||target.webkitRequestFullscreen;
+      if(request)await request.call(target);
+    }
+  }catch(error){console.warn('Tam ekran açılamadı.',error);}
+}
 let computerInteractCount=0;
 let postTinyPeopleDialogueShown=false;
 let postTinyPeopleDialoguePending=false;
@@ -1749,6 +1769,10 @@ document.addEventListener('keydown',e=>{
   if(e.code==='KeyQ'&&!e.repeat){
     e.preventDefault();
     zoomEnabled=!zoomEnabled;
+  }
+  if(e.code==='KeyL'&&!e.repeat){
+    e.preventDefault();
+    if(started&&!sleeping&&!sleepAnimation&&!waking)toggleFullscreenFromKey();
   }
   if(e.code==='KeyF'&&!e.repeat){
     if(started&&(forestActive||backroomsActive)&&!sleeping&&!waking&&!sleepAnimation){
@@ -2273,8 +2297,8 @@ function startStalkerDialogue(){
   stalkerDialogueActive=true;
   const line=nextStalkerTaunt();
   if(!line){stalkerDialogueActive=false;return;}
-  // Ormandaki silüetler konuşur; karakter cevap vermez.
-  showSubtitle(line);
+  // Silüetlerin replikleri daha hızlı yazılır; diğer karakter repliklerinin hızı değişmez.
+  showSubtitle(line,48);
   const duration=Math.max(4200,line.length*70+1800);
   const timer=setTimeout(()=>{stalkerDialogueActive=false;},duration);
   stalkerDialogueTimers.push(timer);
